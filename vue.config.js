@@ -6,7 +6,7 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || '若依微信管理系统' // 标题
+const name = defaultSettings.title || '尚德微信管理系统' // 标题
 
 const port = process.env.port || process.env.npm_config_port || 8083 // 端口
 
