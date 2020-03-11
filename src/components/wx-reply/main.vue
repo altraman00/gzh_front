@@ -217,7 +217,7 @@
           "title":'',
           "introduction":''
         },
-        actionUrl: '/dev-api/wxmaterial/materialFileUpload',
+        actionUrl: '/api/wxmaterial/materialFileUpload',
         headers: {
           Authorization: 'Bearer ' + getToken()
         }

@@ -38,6 +38,13 @@ module.exports = {
         pathRewrite: {
           ['^' + process.env.VUE_APP_BASE_API]: ''
         }
+      },
+      '^/wechat': {
+        target: 'https://api.weixin.qq.com/',
+        changeOrigin: true,
+        pathRewrite: {
+          ['^/wechat']: ''
+        }
       }
     },
     disableHostCheck: true
