@@ -15,12 +15,17 @@
       </div>
       <div class="info-item">
           <label>openid</label>
-          <p></p>
+          <p>{{route}}</p>
       </div>
   </div>
 </template>
 <script>
 export default {
+    data () {
+        return {
+            route: this.$route
+        }
+    },
     created () {
         console.log('router', this.$route)
     }
