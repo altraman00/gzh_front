@@ -27,13 +27,15 @@ const SECRET = '22437a698a6bac6837a866d723c9a261'
 export default {
     data () {
         return {
+            code: null
         }
     },
     created () {
         const code = this.$route.query.code
+        this.code = code
         console.log('router', this.$route.query.code)
-        let url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${APPID}&secret=${SECRET}&code=${code}&grant_type=authorization_code`
-        axios.get(url, { withCredentials: true }).then(res => {
+        let url = `/wechat/sns/oauth2/access_token?appid=${APPID}&secret=${SECRET}&code=${code}&grant_type=authorization_code`
+        axios.get(url).then(res => {
 
         })
     }
