@@ -336,7 +336,7 @@
           pageSize: 10 // 每页显示多少条
         },
         tableLoading: false,
-        actionUrl: '/dev-api/wxmaterial/materialFileUpload',
+        actionUrl: '/api/wxmaterial/materialFileUpload',
         headers: {
           Authorization: 'Bearer ' + getToken()
         },
