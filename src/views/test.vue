@@ -33,7 +33,9 @@ export default {
         const code = this.$route.query.code
         console.log('router', this.$route.query.code)
         let url = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${APPID}&secret=${SECRET}&code=${code}&grant_type=authorization_code`
-        axios.get(url)
+        axios.get(url, { withCredentials: true }).then(res => {
+
+        })
     }
 }
 </script>
