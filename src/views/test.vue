@@ -15,7 +15,7 @@
       </div>
       <div class="info-item">
           <label>openid</label>
-          <p></p>
+          <p>{{code}}</p>
       </div>
   </div>
 </template>
