@@ -74,13 +74,13 @@ export default {
     border-radius: 50%;
   }
   .info-item{
-      width: 300px;
+      width: 200px;
       display: flex;
       justify-content: flex-start;
       align-items: center;
       margin-top: 10px;
       label{
-          width: 100px;
+          width: 600px;
       }
   }
 }
