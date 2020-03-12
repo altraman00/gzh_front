@@ -1,21 +1,17 @@
 <template>
   <div class="wrap">
-      <div class="avatar"></div>
-      <div class="info-item">
+      <div v-if = "user && user.headImgUrl" :style="{backgroundImage: `url(${user.headImgUrl})`}" class="avatar"></div>
+      <div v-if = "user && user.nickname" class="info-item">
           <label>昵称</label>
-          <p></p>
+          <p>{{user.nickname}}</p>
       </div>
-      <div class="info-item">
+      <div v-if = "user && user.sexDesc" class="info-item">
           <label>性别</label>
-          <p></p>
+          <p>{{user.sexDesc}}</p>
       </div>
-      <div class="info-item">
+      <div v-if = "user && user.country && user.province" class="info-item">
           <label>地址</label>
-          <p>{{res}}</p>
-      </div>
-      <div class="info-item">
-          <label>openid</label>
-          <p>{{code}}</p>
+          <p>{{user.country}} {{user.province}}</p>
       </div>
   </div>
 </template>
@@ -28,7 +24,8 @@ export default {
     data () {
         return {
             code: null,
-            res: null
+            res: null,
+            user: null
         }
     },
     methods: {
@@ -42,6 +39,7 @@ export default {
         getUserInfo (code) {
             getOauth2({ code }).then(res => {
                 this.res = res
+                this.user = res.data.data.wxMpUser
             })
         }
     },
@@ -61,7 +59,10 @@ export default {
     justify-self: center;
     align-items: center;
     flex-direction: column;
-    background: rgba($color: #ddd, $alpha: 0.6);
+    background-color: rgba($color: #ddd, $alpha: 0.6);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
     .avatar{
         display: inline-block;
         width: 100px;
