@@ -6,15 +6,15 @@
       class="avatar"
     ></div>
     <div v-if="user && user.nickname" class="info-item">
-      <label>昵称</label>
+      <label>昵称：</label>
       <p>{{user.nickname}}</p>
     </div>
     <div v-if="user && user.sexDesc" class="info-item">
-      <label>性别</label>
+      <label>性别：</label>
       <p>{{user.sexDesc}}</p>
     </div>
     <div v-if="user && user.country && user.province" class="info-item">
-      <label>地址</label>
+      <label>地址：</label>
       <p>{{user.country}} {{user.province}}</p>
     </div>
   </div>
@@ -74,10 +74,14 @@ export default {
     border-radius: 50%;
   }
   .info-item{
+      width: 300px;
       display: flex;
       justify-content: center;
       align-items: center;
       margin-top: 10px;
+      label{
+          width: 100px;
+      }
   }
 }
 </style>
