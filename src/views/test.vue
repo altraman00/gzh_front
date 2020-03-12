@@ -80,7 +80,7 @@ export default {
       align-items: center;
       margin-top: 10px;
       label{
-          width: 600px;
+          width: 60px;
       }
   }
 }
