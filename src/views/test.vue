@@ -76,7 +76,7 @@ export default {
   .info-item{
       width: 300px;
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
       margin-top: 10px;
       label{
