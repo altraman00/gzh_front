@@ -21,7 +21,7 @@ export const getWechatInfo = params => {
 
 export const getOauth2 = params => {
   return axios({
-    url: '/open/wxmp/oauth2',
+    url: '/api/open/wxmp/oauth2',
     method: 'get',
     params: params
   })
