@@ -30,3 +30,15 @@ export const getMsgTemplateList = params => {
         params: params
     })
 }
+
+export const editTemplate = (id, params) => {
+    // return request({
+    //     url: `/wxactivity/template/message/${id}`,
+    //     method: 'patch',
+    //     headers: {
+    //         'Content-Type': 'application/x-www-form-urlencoded' 
+    //     },
+    //     params: params
+    // })
+    return request.patch(`/wxactivity/template/message/${id}`, params)
+}
