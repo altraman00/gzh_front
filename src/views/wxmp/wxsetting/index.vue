@@ -63,7 +63,7 @@
         <el-input type="textarea" v-model="selectedTmp.remark"></el-input>
       </div>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="cancelEditPosterModalShow = false">取 消</el-button>
+        <el-button @click="cancelEditPosterModalShow">取 消</el-button>
         <el-button type="primary" @click="confirmEditPosterModal">确 定</el-button>
       </div>
     </el-dialog>
@@ -142,6 +142,7 @@ export default {
         Authorization: "Bearer " + getToken()
       },
       file: null,
+      tempFile: null,
       uploadImgUrl: null,
       fileList: [],
       uploadData:{
@@ -206,8 +207,8 @@ export default {
     confirmEditPosterModal(){
       let params = {
         remark: this.selectedTmp.remark,
-        repContent: this.selectedTmp.repContent,
-        repMediaId: this.selectedTmp.repMediaId
+        repContent: this.tempFile || this.selectedTmp.repContent,
+        repMediaId: this.uploadImgUrl || this.selectedTmp.repMediaId
       }
       editTemplate(this.selectedTmp.id, params).then(res => {
         console.log('res', res)
@@ -217,7 +218,7 @@ export default {
             type: 'success'
           })
           this.editPosterModalShow = false
-          this.getTemplateList()
+          this.getWechatInfo()
         }
       })
     },
@@ -240,8 +241,10 @@ export default {
     },
     handleUploadSuccess(response, file, fileList) {
       if (response.code == 200) {
-        this.selectedTmp.repContent = response.url
-        this.selectedTmp.repMediaId = response.mediaId
+        this.tempFile = response.data.url
+        this.uploadImgUrl = response.data.mediaId
+        // this.selectedTmp.repContent = response.url
+        // this.selectedTmp.repMediaId = response.mediaId
         // this.fileList = [];
         // this.uploadData.title = "";
         // this.uploadData.introduction = "";

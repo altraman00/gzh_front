@@ -6,8 +6,8 @@
 
     <div class="right-menu">
       <template v-if="device!=='mobile'">
-        <search id="header-search" class="right-menu-item" />
-
+        <!-- <search id="header-search" class="right-menu-item" />
+        
         <el-tooltip effect="dark" content="多公众号版本" placement="bottom">
           <div class="right-menu-item hover-effect">
             <el-link type="success" href="https://demo.joolun.com/" target="_blank" class="el-icon-s-promotion">多公众号版</el-link>
@@ -20,8 +20,12 @@
 
         <el-tooltip content="文档地址" effect="dark" placement="bottom">
           <ruo-yi-doc id="ruoyi-doc" class="right-menu-item hover-effect" />
+        </el-tooltip> -->
+        <el-tooltip effect="dark" content="尚德在线学堂" placement="bottom">
+          <div class="right-menu-item hover-effect">
+            <el-link type="success" href="#" target="_blank" class="el-icon-s-promotion">公众号：尚德在线学堂</el-link>
+          </div>
         </el-tooltip>
-
         <screenfull id="screenfull" class="right-menu-item hover-effect" />
 
         <el-tooltip content="布局大小" effect="dark" placement="bottom">
