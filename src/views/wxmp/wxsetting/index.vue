@@ -1,7 +1,11 @@
 <template>
   <div :class="{'nodatas': !currentTemp}" class="app-container">
+    <div v-if = "!currentTemp" class="nodata-setting">
+      <p>暂未配置运营活动，请先点击配置</p>
+      <el-button type="primary" @click="dialogShow = true">配置运营活动</el-button>
+    </div>
     <!-- <avue-crud ref="crud" :data="tableData" :option="tableOption" :page="page"></avue-crud> -->
-    <div class="toolbar">
+    <div v-if = "currentTemp" class="toolbar">
       <div v-if="currentTemp" class="left">
         当前活动：
         <span class="activity-name">{{currentTemp.templateName}}</span>
@@ -12,7 +16,7 @@
         <el-button @click="dialogShow = true" type="primary">切换活动模板</el-button>
       </div>
     </div>
-    <div class="content">
+    <div v-if = "currentTemp" class="content">
       <el-table :data="tableData" stripe style="width: 100%;white-space:pre-line;">
         <el-table-column type="index" label="序号" align="center" width="80"></el-table-column>
         <el-table-column prop="repTypeDesc" label="类型" width="80"></el-table-column>
@@ -297,6 +301,7 @@ export default {
             type: "success"
           });
           this.dialogShow = false;
+          this.getWechatInfo()
         }
       });
     },
@@ -340,6 +345,13 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100%;
+  }
+  .nodata-setting{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
   }
   .toolbar {
     width: 100%;
