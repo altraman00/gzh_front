@@ -160,7 +160,7 @@ export default {
   },
   methods: {
     handleToggleActivity () {
-      toggleActivity(this.currentTemp.id, { activityEnable: !this.active }).then(res => {
+      toggleActivity(this.appId, { activityEnable: !this.active }).then(res => {
         if (res.code === 200) {
           this.$message({
             message: '操作成功',
@@ -337,7 +337,7 @@ export default {
         if (res.data.code === 200) {
           this.appId = res.data.data.wxMp.appId;
           this.currentTemp = res.data.data.template;
-          this.activityEnable = this.currentTemp.activityEnable
+          this.active = res.data.data.wxMp.activityEnable
           if (this.currentTemp) {
             this.getMsgTemplateList();
           }
