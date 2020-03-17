@@ -9,10 +9,10 @@
       <div v-if="currentTemp" class="left">
         当前活动：
         <span class="activity-name">{{currentTemp.templateName}}</span>
-        <span class="status">活动进行中</span>
+        <span :class="{paused: !active}" class="status">{{active ? '活动进行中' : '活动暂停中'}}</span>
       </div>
       <div class="right">
-        <el-button>活动暂停</el-button>
+        <el-button @click="handleToggleActivity">{{active ? '活动暂停' : '活动继续'}}</el-button>
         <el-button @click="dialogShow = true" type="primary">切换活动模板</el-button>
       </div>
     </div>
@@ -115,7 +115,8 @@ import {
   getTemplateList,
   getMsgTemplateList,
   bindTemplate,
-  editTemplate
+  editTemplate,
+  toggleActivity
 } from "@/api/wxmp/wxsetting";
 import { getToken } from "@/utils/auth";
 import { getWechatInfo } from "@/api/test";
@@ -150,13 +151,25 @@ export default {
       uploadImgUrl: null,
       fileList: [],
       uploadData:{
-          "mediaType": 'image',
-          "title":'',
-          "introduction":''
-        },
+        "mediaType": 'image',
+        "title":'',
+        "introduction":''
+      },
+      active: false
     };
   },
   methods: {
+    handleToggleActivity () {
+      toggleActivity(this.currentTemp.id, { activityEnable: !this.active }).then(res => {
+        if (res.code === 200) {
+          this.$message({
+            message: '操作成功',
+            type: 'success'
+          })
+          this.getWechatInfo()
+        }
+      })
+    },
     cancelEditPosterModalShow() {
       this.fileList = []
       this.uploadData = {
@@ -215,7 +228,6 @@ export default {
         repMediaId: this.uploadImgUrl || this.selectedTmp.repMediaId
       }
       editTemplate(this.selectedTmp.id, params).then(res => {
-        console.log('res', res)
         if (res.code === 200) {
           this.$message({
             message: '操作成功',
@@ -325,6 +337,7 @@ export default {
         if (res.data.code === 200) {
           this.appId = res.data.data.wxMp.appId;
           this.currentTemp = res.data.data.template;
+          this.activityEnable = this.currentTemp.activityEnable
           if (this.currentTemp) {
             this.getMsgTemplateList();
           }
@@ -363,6 +376,9 @@ export default {
       color: #67c23a;
       display: inline-block;
       margin-left: 12px;
+      &.paused{
+        color: #E6A23C;
+      }
     }
   }
   .content {

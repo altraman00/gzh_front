@@ -42,3 +42,7 @@ export const editTemplate = (id, params) => {
     // })
     return request.patch(`/wxactivity/template/message/${id}`, params)
 }
+
+export const toggleActivity = (id, params) => {
+    return request.patch(`/wxactivity/status/${id}`, params)
+}
