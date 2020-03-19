@@ -46,3 +46,7 @@ export const editTemplate = (id, params) => {
 export const toggleActivity = (id, params) => {
     return request.patch(`/wxactivity/status/${id}`, params)
 }
+
+export const previewPoster = id => {
+    return request.get(`/wxactivity/template/${id}/poster/preview`)
+}

@@ -1,10 +1,9 @@
 <template>
-  <div :class="{'nodatas': !currentTemp}" class="app-container">
+  <div :class="{'nodata': !currentTemp}" class="app-container">
     <div v-if="!currentTemp" class="nodata-setting">
       <p>暂未配置运营活动，请先点击配置</p>
       <el-button type="primary" @click="dialogShow = true">配置运营活动</el-button>
     </div>
-    <!-- <avue-crud ref="crud" :data="tableData" :option="tableOption" :page="page"></avue-crud> -->
     <div v-if="currentTemp" class="toolbar">
       <div v-if="currentTemp" class="left">
         当前活动：
@@ -16,6 +15,7 @@
         <el-button @click="dialogShow = true" type="primary">切换活动模板</el-button>
       </div>
     </div>
+    <!-- <avue-crud ref="crud" :data="tableData" :option="tableOption" :page="page"></avue-crud> -->
     <div v-if="currentTemp" class="content">
       <el-table :data="tableData" stripe style="width: 100%;white-space:pre-line;">
         <el-table-column type="index" label="序号" align="center" width="80"></el-table-column>
@@ -35,13 +35,14 @@
         <el-table-column prop="remark" label="备注"></el-table-column>
         <el-table-column label="操作" width="160">
           <template slot-scope="scope">
-            <el-button
+            <a
+            style="color: #409EFF;cursor: pointer;margin-right: 12px;"
               v-if="scope.row.repType === 'poster'"
               @click="handlePreviewPosterModal(scope.row)"
               size="mini"
               type="primary"
-            >预览</el-button>
-            <el-button size="mini" @click="handleEditTmp(scope.row)">编辑</el-button>
+            >预览</a>
+            <a style="color: #409EFF;cursor: pointer;" size="mini" @click="handleEditTmp(scope.row)">编辑</a>
             <!-- <el-button size="mini" type="danger">删除</el-button> -->
           </template>
         </el-table-column>
@@ -49,6 +50,7 @@
     </div>
     <el-dialog title="编辑海报" :visible.sync="editPosterModalShow">
       <div style="text-align:center;" v-if="selectedTmp" class="msg-main">
+        <el-form>
         <p style="text-align:left;font-weight:600">海报底图上传</p>
         <el-upload
           :action="actionUrl"
@@ -65,18 +67,31 @@
         </el-upload>
         <el-row style="margin-top: 10px;" type="flex" justify="start" align="middle">
           <span style="width: 150px;text-align:left;">二维码定位坐标(x, y)：</span>
-          <el-input v-model="selectedTmp.qrcodeCoordinate" style="width: 100px;"></el-input>&nbsp;
+          <el-form-item style="margin-bottom: 0;position: relative;" :class="{'is-error': !rules.qrcodeCoordinate.status}">
+            <el-input @blur="checkoutQrcodeCoordinate" v-model="selectedTmp.qrcodeCoordinate" style="width: 100px;"></el-input>&nbsp;
+            <small style="position: absolute;left:0;top: 30px;color:#F56C6C;" v-if="!rules.qrcodeCoordinate.status">{{rules.qrcodeCoordinate.msg}}</small>
+          </el-form-item>
           <span style="width: 100px;text-align:left;margin-left: 20px;">二维码大小：</span>
-          <el-input v-model="selectedTmp.qrcodeSize" style="width: 100px;"></el-input>&nbsp;px
+          <el-form-item style="margin-bottom: 0;" :class="{'is-error': !rules.qrcodeSize.status}">
+            <el-input @blur="checkoutQrcodeSize" v-model="selectedTmp.qrcodeSize" style="width: 100px;"></el-input>&nbsp;px
+            <small style="position: absolute;left:0;top: 30px;color:#F56C6C;" v-if="!rules.qrcodeSize.status">{{rules.qrcodeSize.msg}}</small>
+          </el-form-item>
         </el-row>
-        <el-row style="margin-top: 10px;" type="flex" justify="start" align="middle">
+        <el-row style="margin-top: 40px;" type="flex" justify="start" align="middle">
           <span style="width: 150px;text-align:left;">头像定位坐标(x, y)：</span>
-          <el-input v-model="selectedTmp.avatarCoordinate" style="width: 100px;"></el-input>&nbsp;
+          <el-form-item style="margin-bottom: 0;position: relative;" :class="{'is-error': !rules.avatarCoordinate.status}">
+            <el-input @blur="checkoutAvatarCoordinate" v-model="selectedTmp.avatarCoordinate" style="width: 100px;"></el-input>&nbsp;
+            <small style="position: absolute;left:0;top: 30px;color:#F56C6C;" v-if="!rules.avatarCoordinate.status">{{rules.avatarCoordinate.msg}}</small>
+          </el-form-item>
           <span style="width: 100px;text-align:left;margin-left: 20px;">头像大小：</span>
-          <el-input v-model="selectedTmp.avatarSize" style="width: 100px"></el-input>&nbsp;px
+          <el-form-item style="margin-bottom: 0;position: relative;" :class="{'is-error': !rules.avatarSize.status}">
+            <el-input @blur="checkoutAvatarSize" v-model="selectedTmp.avatarSize" style="width: 100px"></el-input>&nbsp;px
+            <small style="position: absolute;left:0;top: 30px;color:#F56C6C;" v-if="!rules.avatarSize.status">{{rules.avatarSize.msg}}</small>
+          </el-form-item>
         </el-row>
         <p style="text-align:left;font-weight:600">备注</p>
         <el-input type="textarea" rows="6" v-model="selectedTmp.remark"></el-input>
+        </el-form>
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="cancelEditPosterModalShow">取 消</el-button>
@@ -84,8 +99,8 @@
       </div>
     </el-dialog>
     <el-dialog title="预览海报" :visible.sync="previewPosterModalShow">
-      <div style="text-align:center;" v-if="selectedTmp" class="msg-main">
-        <img :src="selectedTmp.repContent" style="max-width:400px;max-height:400px;" />
+      <div v-loading="loading" style="text-align:center;" v-if="selectedTmp" class="msg-main">
+        <img :src="currentPoster" style="max-width:400px;max-height:400px;" />
         <p>{{selectedTmp.remark}}</p>
       </div>
     </el-dialog>
@@ -128,7 +143,8 @@ import {
   getMsgTemplateList,
   bindTemplate,
   editTemplate,
-  toggleActivity
+  toggleActivity,
+  previewPoster
 } from "@/api/wxmp/wxsetting";
 import { getToken } from "@/utils/auth";
 import { getWechatInfo } from "@/api/test";
@@ -136,11 +152,27 @@ export default {
   components: {},
   data() {
     return {
-      avatarCoordinate: null,
-      avatarSize: null,
-      qrcodeCoordinate: null,
-      qrcodeSize: null,
+      rules: {
+        avatarCoordinate: {
+          status: true,
+          msg: ''
+        },
+        avatarSize: {
+          status: true,
+          msg: ''
+        },
+        qrcodeCoordinate: {
+          status: true,
+          msg: ''
+        },
+        qrcodeSize: {
+          status: true,
+          msg: ''
+        }
+      },
+      loading: false,
       currentFile: null,
+      currentPoster: null,
       editPosterModalShow: false,
       selectedTmp: null,
       previewPosterModalShow: false,
@@ -175,6 +207,54 @@ export default {
     };
   },
   methods: {
+    checkoutQrcodeCoordinate () {
+      if (this.selectedTmp && this.selectedTmp.qrcodeCoordinate) {
+        let reg = /^(\d)+,(\d)+$/g
+        if (!reg.test(this.selectedTmp.qrcodeCoordinate)) {
+          this.rules.qrcodeCoordinate.status = false
+          this.rules.qrcodeCoordinate.msg = '格式不正确' 
+        } else {
+          this.rules.qrcodeCoordinate.status = true
+          this.rules.qrcodeCoordinate.msg = '' 
+        }
+      } else {
+        this.rules.qrcodeCoordinate.status = false
+        this.rules.qrcodeCoordinate.msg = '内容不可以为空' 
+      } 
+    },
+    checkoutAvatarCoordinate () {
+      if (this.selectedTmp && this.selectedTmp.avatarCoordinate) {
+        let reg = /^(\d)+,(\d)+$/g
+        if (!reg.test(this.selectedTmp.avatarCoordinate)) {
+          this.rules.avatarCoordinate.status = false
+          this.rules.avatarCoordinate.msg = '格式不正确' 
+        } else {
+          this.rules.avatarCoordinate.status = true
+          this.rules.avatarCoordinate.msg = '' 
+        }
+      } else {
+        this.rules.avatarCoordinate.status = false
+        this.rules.avatarCoordinate.msg = '内容不可以为空' 
+      } 
+    },
+    checkoutQrcodeSize () {
+      if (!this.selectedTmp || !this.selectedTmp.qrcodeCoordinate) {
+        this.rules.qrcodeSize.status = false
+        this.rules.qrcodeSize.msg = '内容不可以为空'
+      } else {
+        this.rules.qrcodeSize.status = true
+        this.rules.qrcodeSize.msg = ''
+      }
+    },
+    checkoutAvatarSize () {
+      if (!this.selectedTmp || !this.selectedTmp.avatarSize) {
+        this.rules.avatarSize.status = false
+        this.rules.avatarSize.msg = '内容不可以为空'
+      } else {
+        this.rules.avatarSize.status = true
+        this.rules.avatarSize.msg = ''
+      }
+    },
     handleToggleActivity() {
       toggleActivity(this.appId, { activityEnable: !this.active }).then(res => {
         if (res.code === 200) {
@@ -238,6 +318,13 @@ export default {
       this.tempObj.set(this.objData.repType, tempObjItem);
     },
     confirmEditPosterModal() {
+      this.checkoutQrcodeCoordinate()
+      this.checkoutQrcodeSize()
+      this.checkoutAvatarCoordinate()
+      this.checkoutAvatarSize()
+      if (!this.rules.qrcodeCoordinate.status || !this.rules.qrcodeSize.status || !this.rules.avatarCoordinate.status || !this.rules.avatarSize.status) {
+        return
+      }
       let params = {
         remark: this.selectedTmp.remark,
         repContent: this.tempFile || this.selectedTmp.repContent,
@@ -310,6 +397,13 @@ export default {
     //   this.editPosterModalShow = true
     // },
     handlePreviewPosterModal(tmp) {
+      this.loading = true
+      previewPoster(tmp.id).then(res => {
+        if (res.code === 200) {
+          this.currentPoster = `data:image/png;base64,${res.data.posterBase64}`
+          this.loading = false
+        }
+      })
       this.previewPosterModalShow = true;
       this.selectedTmp = tmp;
     },
@@ -380,10 +474,11 @@ export default {
 <style lang="scss" scoped>
 .app-container {
   &.nodata {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
+    height: calc(100vh - 84px);
   }
   .nodata-setting {
     display: flex;
