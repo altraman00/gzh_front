@@ -20,7 +20,7 @@
   </div>
 </template>
 <script>
-import { getWechatInfo, getOauth2 } from "@/api/test";
+import { getAccessToken, getWechatInfo, getOauth2 } from "@/api/test";
 const APPID = "wx1ae5569fd1bd1e3e";
 const SECRET = "22437a698a6bac6837a866d723c9a261";
 
@@ -41,14 +41,15 @@ export default {
       });
     },
     getUserInfo(code) {
-      getOauth2({ code }).then(res => {
+      getOauth2({ code, appId: APPID, secret: SECRET }).then(res => {
         this.res = res;
         this.user = res.data.data.wxMpUser;
       });
     }
   },
   created() {
-    // this.getWechatInfo()
+    getAccessToken(APPID)
+    this.getWechatInfo()
     if (this.$route.query.code) {
       const code = this.$route.query.code;
       this.getUserInfo(code);

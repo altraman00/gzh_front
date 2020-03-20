@@ -90,7 +90,7 @@
           </el-form-item>
         </el-row>
         <p style="text-align:left;font-weight:600">备注</p>
-        <el-input type="textarea" rows="6" v-model="selectedTmp.remark"></el-input>
+        <el-input type="textarea" show-word-limit maxlength="1000" rows="6" v-model="selectedTmp.remark"></el-input>
         </el-form>
       </div>
       <div slot="footer" class="dialog-footer">
@@ -107,9 +107,9 @@
     <el-dialog title="编辑海报" :visible.sync="editTextModalShow">
       <div v-if="selectedTmp" class="msg-main">
         <p class="title">内容</p>
-        <el-input rows="6" type="textarea" v-model="selectedTmp.repContent"></el-input>
+        <el-input rows="6" maxlength="1000" type="textarea" show-word-limit v-model="selectedTmp.repContent"></el-input>
         <p>备注</p>
-        <el-input rows="6" type="textarea" v-model="selectedTmp.remark"></el-input>
+        <el-input rows="6" maxlength="1000" type="textarea" show-word-limit v-model="selectedTmp.remark"></el-input>
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="editTextModalShow = false">取 消</el-button>
@@ -325,6 +325,9 @@ export default {
       if (!this.rules.qrcodeCoordinate.status || !this.rules.qrcodeSize.status || !this.rules.avatarCoordinate.status || !this.rules.avatarSize.status) {
         return
       }
+      if (this.selectedTmp.remark.length > 1000) {
+        return
+      }
       let params = {
         remark: this.selectedTmp.remark,
         repContent: this.tempFile || this.selectedTmp.repContent,
@@ -346,6 +349,9 @@ export default {
       });
     },
     confirmEditTextModal() {
+      if (this.selectedTmp.remark.length > 1000) {
+        return
+      }
       let params = {
         remark: this.selectedTmp.remark,
         repContent: this.selectedTmp.repContent,
