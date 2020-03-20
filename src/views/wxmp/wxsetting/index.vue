@@ -119,7 +119,7 @@
     <el-dialog title="配置运营活动" :visible.sync="dialogShow">
       <div class="msg-main">
         <p>选择活动模板</p>
-        <el-select v-model="currentTemp">
+        <el-select v-model="selectCurrenTemplate">
           <el-option
             v-for="item in tempList"
             :key="item.id"
@@ -152,6 +152,7 @@ export default {
   components: {},
   data() {
     return {
+      selectCurrenTemplate: null,
       rules: {
         avatarCoordinate: {
           status: true,
@@ -429,7 +430,7 @@ export default {
     handleConfirmModal() {
       const params = {
         appId: this.appId,
-        templateId: this.currentTemp.id
+        templateId: this.selectCurrenTemplate.id
       };
       bindTemplate(params).then(res => {
         if (res.code === 200) {
