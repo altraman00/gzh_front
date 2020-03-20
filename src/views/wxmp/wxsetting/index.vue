@@ -106,10 +106,10 @@
     </el-dialog>
     <el-dialog title="编辑海报" :visible.sync="editTextModalShow">
       <div v-if="selectedTmp" class="msg-main">
-        <p>标题： {{selectedTmp.title}}</p>
-        <p class="title">内容</p>
+        <p style="font-weight: 600;margin-bottom: 10px;">标题： <span style="font-weight: 400;">{{selectedTmp.title}}</span></p>
+        <p style="font-weight: 600;" class="title">内容</p>
         <el-input rows="6" maxlength="1000" type="textarea" show-word-limit v-model="selectedTmp.repContent"></el-input>
-        <p>备注</p>
+        <p style="font-weight: 600;">备注</p>
         <el-input rows="6" maxlength="1000" type="textarea" show-word-limit v-model="selectedTmp.remark"></el-input>
       </div>
       <div slot="footer" class="dialog-footer">
@@ -444,11 +444,11 @@ export default {
     },
     handleEditTmp(tmp) {
       if (tmp.repType === "poster") {
+        this.selectedTmp = JSON.parse(JSON.stringify(tmp));
         this.checkoutQrcodeCoordinate()
         this.checkoutAvatarCoordinate()
         this.checkoutQrcodeSize()
         this.checkoutAvatarSize()
-        this.selectedTmp = JSON.parse(JSON.stringify(tmp));
         this.editPosterModalShow = true;
       } else {
         this.selectedTmp = tmp;
