@@ -12,7 +12,7 @@
       </div>
       <div class="right">
         <el-button @click="handleToggleActivity">{{active ? '活动暂停' : '活动继续'}}</el-button>
-        <el-button @click="dialogShow = true" type="primary">切换活动模板</el-button>
+        <el-button @click="handleChangeTemplate" type="primary">切换活动模板</el-button>
       </div>
     </div>
     <!-- <avue-crud ref="crud" :data="tableData" :option="tableOption" :page="page"></avue-crud> -->
@@ -106,6 +106,7 @@
     </el-dialog>
     <el-dialog title="编辑海报" :visible.sync="editTextModalShow">
       <div v-if="selectedTmp" class="msg-main">
+        <p>标题： {{selectedTmp.title}}</p>
         <p class="title">内容</p>
         <el-input rows="6" maxlength="1000" type="textarea" show-word-limit v-model="selectedTmp.repContent"></el-input>
         <p>备注</p>
@@ -208,6 +209,15 @@ export default {
     };
   },
   methods: {
+    handleChangeTemplate () {
+      this.$confirm('切换后当前活动不可用，是否切换活动模板？', '切换活动模板', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.dialogShow = true
+      })
+    },
     checkoutQrcodeCoordinate () {
       if (this.selectedTmp && this.selectedTmp.qrcodeCoordinate) {
         let reg = /^(\d)+,(\d)+$/g
@@ -239,12 +249,18 @@ export default {
       } 
     },
     checkoutQrcodeSize () {
-      if (!this.selectedTmp || !this.selectedTmp.qrcodeCoordinate) {
+      if (!this.selectedTmp || !this.selectedTmp.qrcodeSize) {
         this.rules.qrcodeSize.status = false
         this.rules.qrcodeSize.msg = '内容不可以为空'
       } else {
-        this.rules.qrcodeSize.status = true
-        this.rules.qrcodeSize.msg = ''
+        let reg = /(^(\d)+$)|(^(\d)+.(\d)+$)/g
+        if (!reg.test(this.selectedTmp.qrcodeSize)) {
+          this.rules.qrcodeSize.status = false
+          this.rules.qrcodeSize.msg = '格式不正确' 
+        } else {
+          this.rules.qrcodeSize.status = true
+          this.rules.qrcodeSize.msg = ''
+        }
       }
     },
     checkoutAvatarSize () {
@@ -252,8 +268,14 @@ export default {
         this.rules.avatarSize.status = false
         this.rules.avatarSize.msg = '内容不可以为空'
       } else {
-        this.rules.avatarSize.status = true
-        this.rules.avatarSize.msg = ''
+        let reg =/(^(\d)+$)|(^(\d)+.(\d)+$)/g
+        if (!reg.test(this.selectedTmp.avatarSize)) {
+          this.rules.avatarSize.status = false
+          this.rules.avatarSize.msg = '格式不正确'
+        } else {
+          this.rules.avatarSize.status = true
+          this.rules.avatarSize.msg = ''
+        }
       }
     },
     handleToggleActivity() {
@@ -268,12 +290,14 @@ export default {
       });
     },
     cancelEditPosterModalShow() {
+      console.log('flad')
       this.fileList = [];
       this.uploadData = {
         mediaType: "image",
         title: "",
         introduction: ""
       };
+      this.selectedTmp = null
       this.editPosterModalShow = false;
     },
     selectMaterial(item) {
@@ -420,7 +444,11 @@ export default {
     },
     handleEditTmp(tmp) {
       if (tmp.repType === "poster") {
-        this.selectedTmp = tmp;
+        this.checkoutQrcodeCoordinate()
+        this.checkoutAvatarCoordinate()
+        this.checkoutQrcodeSize()
+        this.checkoutAvatarSize()
+        this.selectedTmp = JSON.parse(JSON.stringify(tmp));
         this.editPosterModalShow = true;
       } else {
         this.selectedTmp = tmp;
