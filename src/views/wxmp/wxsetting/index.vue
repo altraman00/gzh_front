@@ -23,7 +23,7 @@
         <el-table-column prop="title" label="标题"></el-table-column>
         <el-table-column label="内容">
           <template slot-scope="scope">
-            <div v-if="scope.row.repType === 'text'" v-html="scope.row.repContent"></div>
+            <div v-if="scope.row.repType === 'text' || scope.row.repType === 'schedule'" v-html="scope.row.repContent"></div>
             <img
               style="max-width: 201px;max-height: 201px;"
               v-if="scope.row.repType === 'poster'"
@@ -107,7 +107,8 @@
     <el-dialog title="编辑海报" :visible.sync="editTextModalShow">
       <div v-if="selectedTmp" class="msg-main">
         <p style="font-weight: 600;margin-bottom: 10px;">标题： <span style="font-weight: 400;">{{selectedTmp.title}}</span></p>
-        <p style="font-weight: 600;" class="title">内容</p>
+        <p v-if="selectedTmp.repType === 'schedule'" style="font-weight: 600;margin-bottom: 10px;">定时规则：  <el-input style="width: 400px;"  v-model="selectedTmp.scheduleCron"></el-input></p>
+        <p style="font-weight: 600;text-align:left;" class="title">内容</p>
         <el-input rows="6" maxlength="1000" type="textarea" show-word-limit v-model="selectedTmp.repContent"></el-input>
         <p style="font-weight: 600;">备注</p>
         <el-input rows="6" maxlength="1000" type="textarea" show-word-limit v-model="selectedTmp.remark"></el-input>
@@ -205,7 +206,12 @@ export default {
         title: "",
         introduction: ""
       },
-      active: false
+      active: false,
+      typeMap: {
+        'text': '文本',
+        'poster': '海报',
+        'schedule': '定时任务'
+      }
     };
   },
   methods: {
@@ -382,6 +388,12 @@ export default {
         repContent: this.selectedTmp.repContent,
         repMediaId: ""
       };
+      if (this.selectedTmp.repType === 'schedule') {
+        params = {
+          ...params,
+          scheduleCron : this.selectedTmp.scheduleCron 
+        }
+      }
       editTemplate(this.selectedTmp.id, params).then(res => {
         if (res.code === 200) {
           this.$message({
@@ -481,7 +493,7 @@ export default {
         this.tableData = res.data.map(item => {
           return {
             ...item,
-            repTypeDesc: item.repType === "text" ? "文本" : "海报"
+            repTypeDesc: this.typeMap[item.repType]
           };
         });
       });
