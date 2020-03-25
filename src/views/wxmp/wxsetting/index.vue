@@ -104,7 +104,7 @@
         <p>{{selectedTmp.remark}}</p>
       </div>
     </el-dialog>
-    <el-dialog title="编辑海报" :visible.sync="editTextModalShow">
+    <el-dialog :title="selectedTmp ? selectedTmp.repType === 'schedule' ? '编辑定时任务':'编辑消息':'编辑消息'" :visible.sync="editTextModalShow">
       <div v-if="selectedTmp" class="msg-main">
         <p style="font-weight: 600;margin-bottom: 10px;">标题： <span style="font-weight: 400;">{{selectedTmp.title}}</span></p>
         <p v-if="selectedTmp.repType === 'schedule'" style="font-weight: 600;margin-bottom: 10px;">定时规则：  <el-input style="width: 400px;"  v-model="selectedTmp.scheduleCron"></el-input></p>
