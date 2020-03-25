@@ -63,7 +63,7 @@
           :data="uploadData"
         >
           <el-button type="primary">上传图片</el-button>
-          <div slot="tip" class="el-upload__tip">支持bmp/png/jpeg/jpg/gif格式，大小不超过2M，图片尺寸宽750px*高1206px</div>
+          <div slot="tip" class="el-upload__tip">支持bmp/png/jpeg/jpg/gif格式，大小不超过2M，建议图片尺寸宽750px*高1206px</div>
         </el-upload>
         <el-row style="margin-top: 10px;" type="flex" justify="start" align="middle">
           <span style="width: 150px;text-align:left;">二维码定位坐标(x, y)：</span>
