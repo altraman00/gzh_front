@@ -68,24 +68,24 @@
         <el-row style="margin-top: 10px;" type="flex" justify="start" align="middle">
           <span style="width: 150px;text-align:left;">二维码定位坐标(x, y)：</span>
           <el-form-item style="margin-bottom: 0;position: relative;" :class="{'is-error': !rules.qrcodeCoordinate.status}">
-            <el-input @blur="checkoutQrcodeCoordinate" v-model="selectedTmp.qrcodeCoordinate" style="width: 100px;"></el-input>&nbsp;
+            <el-input class="placeholder-style" @blur="checkoutQrcodeCoordinate" v-model="selectedTmp.qrcodeCoordinate" placeholder="请在英文状态下输入坐标值，单位px" style="width: 227px;"></el-input>&nbsp;
             <small style="position: absolute;left:0;top: 30px;color:#F56C6C;" v-if="!rules.qrcodeCoordinate.status">{{rules.qrcodeCoordinate.msg}}</small>
           </el-form-item>
           <span style="width: 100px;text-align:left;margin-left: 20px;">二维码大小：</span>
           <el-form-item style="margin-bottom: 0;" :class="{'is-error': !rules.qrcodeSize.status}">
-            <el-input @blur="checkoutQrcodeSize" v-model="selectedTmp.qrcodeSize" style="width: 100px;"></el-input>&nbsp;px
+            <el-input class="placeholder-style" @blur="checkoutQrcodeSize" placeholder="请输入整数" v-model="selectedTmp.qrcodeSize" style="width: 100px;"></el-input>&nbsp;px
             <small style="position: absolute;left:0;top: 30px;color:#F56C6C;" v-if="!rules.qrcodeSize.status">{{rules.qrcodeSize.msg}}</small>
           </el-form-item>
         </el-row>
         <el-row style="margin-top: 40px;" type="flex" justify="start" align="middle">
           <span style="width: 150px;text-align:left;">头像定位坐标(x, y)：</span>
           <el-form-item style="margin-bottom: 0;position: relative;" :class="{'is-error': !rules.avatarCoordinate.status}">
-            <el-input @blur="checkoutAvatarCoordinate" v-model="selectedTmp.avatarCoordinate" style="width: 100px;"></el-input>&nbsp;
+            <el-input class="placeholder-style" placeholder="请在英文状态下输入坐标值，单位px" @blur="checkoutAvatarCoordinate" v-model="selectedTmp.avatarCoordinate" style="width: 227px;"></el-input>&nbsp;
             <small style="position: absolute;left:0;top: 30px;color:#F56C6C;" v-if="!rules.avatarCoordinate.status">{{rules.avatarCoordinate.msg}}</small>
           </el-form-item>
           <span style="width: 100px;text-align:left;margin-left: 20px;">头像大小：</span>
           <el-form-item style="margin-bottom: 0;position: relative;" :class="{'is-error': !rules.avatarSize.status}">
-            <el-input @blur="checkoutAvatarSize" v-model="selectedTmp.avatarSize" style="width: 100px"></el-input>&nbsp;px
+            <el-input class="placeholder-style" placeholder="请输入整数" @blur="checkoutAvatarSize" v-model="selectedTmp.avatarSize" style="width: 100px"></el-input>&nbsp;px
             <small style="position: absolute;left:0;top: 30px;color:#F56C6C;" v-if="!rules.avatarSize.status">{{rules.avatarSize.msg}}</small>
           </el-form-item>
         </el-row>
@@ -229,7 +229,7 @@ export default {
         let reg = /^(\d)+,(\d)+$/g
         if (!reg.test(this.selectedTmp.qrcodeCoordinate)) {
           this.rules.qrcodeCoordinate.status = false
-          this.rules.qrcodeCoordinate.msg = '格式不正确' 
+          this.rules.qrcodeCoordinate.msg = '请在英文状态下输入坐标值，单位px' 
         } else {
           this.rules.qrcodeCoordinate.status = true
           this.rules.qrcodeCoordinate.msg = '' 
@@ -244,7 +244,7 @@ export default {
         let reg = /^(\d)+,(\d)+$/g
         if (!reg.test(this.selectedTmp.avatarCoordinate)) {
           this.rules.avatarCoordinate.status = false
-          this.rules.avatarCoordinate.msg = '格式不正确' 
+          this.rules.avatarCoordinate.msg = '请在英文状态下输入坐标值，单位px' 
         } else {
           this.rules.avatarCoordinate.status = true
           this.rules.avatarCoordinate.msg = '' 
@@ -259,10 +259,10 @@ export default {
         this.rules.qrcodeSize.status = false
         this.rules.qrcodeSize.msg = '内容不可以为空'
       } else {
-        let reg = /(^(\d)+$)|(^(\d)+.(\d)+$)/g
+        let reg = /^(\d)+$/g
         if (!reg.test(this.selectedTmp.qrcodeSize)) {
           this.rules.qrcodeSize.status = false
-          this.rules.qrcodeSize.msg = '格式不正确' 
+          this.rules.qrcodeSize.msg = '请输入整数' 
         } else {
           this.rules.qrcodeSize.status = true
           this.rules.qrcodeSize.msg = ''
@@ -274,10 +274,10 @@ export default {
         this.rules.avatarSize.status = false
         this.rules.avatarSize.msg = '内容不可以为空'
       } else {
-        let reg =/(^(\d)+$)|(^(\d)+.(\d)+$)/g
+        let reg =/^(\d)+$/g
         if (!reg.test(this.selectedTmp.avatarSize)) {
           this.rules.avatarSize.status = false
-          this.rules.avatarSize.msg = '格式不正确'
+          this.rules.avatarSize.msg = '请输入整数'
         } else {
           this.rules.avatarSize.status = true
           this.rules.avatarSize.msg = ''
