@@ -107,7 +107,7 @@
     <el-dialog :title="selectedTmp ? selectedTmp.repType === 'schedule' ? '编辑定时任务':'编辑消息':'编辑消息'" :visible.sync="editTextModalShow">
       <div v-if="selectedTmp" class="msg-main">
         <p style="font-weight: 600;margin-bottom: 10px;">标题： <span style="font-weight: 400;">{{selectedTmp.title}}</span></p>
-        <p v-if="selectedTmp.repType === 'schedule'" style="font-weight: 600;margin-bottom: 10px;">定时规则：  <el-input style="width: 400px;"  v-model="selectedTmp.scheduleCron"></el-input></p>
+        <p v-if="selectedTmp.repType === 'schedule'" style="font-weight: 600;margin-bottom: 10px;">定时规则：  <el-input style="width: 360px;"  v-model="selectedTmp.scheduleCron"></el-input><el-button plain style="margin-left: 12px" type="primary"><a href="https://www.pppet.net/" target="_blank">规则生成器</a></el-button></p>
         <p style="font-weight: 600;text-align:left;" class="title">内容</p>
         <el-input rows="6" maxlength="1000" type="textarea" show-word-limit v-model="selectedTmp.repContent"></el-input>
         <p style="font-weight: 600;">备注</p>
