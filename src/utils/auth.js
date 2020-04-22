@@ -16,7 +16,13 @@ export function removeToken() {
 }
 
 export function getCurrentGZH() {
-  return JSON.parse(Cookies.get(GZHKey))
+  let value = Cookies.get(GZHKey)
+  if (value) {
+    return JSON.parse(Cookies.get(GZHKey))
+  } else  {
+    return null
+  }
+  
 }
 
 export function setCurrentGZH(gzh) {

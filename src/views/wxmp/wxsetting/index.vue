@@ -150,6 +150,7 @@ import {
 } from "@/api/wxmp/wxsetting";
 import { getToken } from "@/utils/auth";
 import { getWechatInfo } from "@/api/test";
+import { getCurrentGZH, setCurrentGZH } from '@/utils/auth'
 export default {
   components: {},
   data() {
@@ -484,7 +485,10 @@ export default {
       });
     },
     getTemplateList() {
-      getTemplateList().then(res => {
+      let params = {
+        type: getCurrentGZH().type
+      }
+      getTemplateList(params).then(res => {
         this.tempList = res.data;
       });
     },
