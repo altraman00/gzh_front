@@ -11,7 +11,6 @@ const whiteList = ['/login', '/auth-redirect', '/402', '/bind', '/register']
 
 router.beforeEach((to, from, next) => {
   NProgress.start()
-  console.log('route', to, from, next)
   if (getToken()) {
     /* has token*/
     if (to.path === '/login') {
@@ -52,7 +51,6 @@ router.beforeEach((to, from, next) => {
     // 没有token
     if (whiteList.indexOf(to.path) !== -1) {
       // 在免登录白名单，直接进入
-      console.log('32435465768')
       next()
     } else {
       next(`/login?redirect=${to.path}`) // 否则全部重定向到登录页

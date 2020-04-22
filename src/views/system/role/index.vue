@@ -195,7 +195,7 @@
 
     <!-- 分配角色数据权限对话框 -->
     <el-dialog :title="title" :visible.sync="openDataScope" width="500px">
-      <el-form :model="form" label-width="80px">
+      <el-form :model="form" label-width="85px">
         <el-form-item label="角色名称">
           <el-input v-model="form.roleName" :disabled="true" />
         </el-form-item>
@@ -223,6 +223,11 @@
             :props="defaultProps"
           ></el-tree>
         </el-form-item>
+        <el-form-item label="公众号权限">
+          <el-checkbox-group v-model="form.mpScope">
+            <el-checkbox v-for="gzh in gzhList" :key="gzh.id" :label="gzh.id" :value="gzh.id">{{gzh.appName}}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitDataScope">确 定</el-button>
@@ -233,6 +238,7 @@
 </template>
 
 <script>
+import { getGZHlist } from '@/api/login'
 import { listRole, getRole, delRole, addRole, updateRole, exportRole, dataScope, changeRoleStatus } from "@/api/system/role";
 import { treeselect as menuTreeselect, roleMenuTreeselect } from "@/api/system/menu";
 import { treeselect as deptTreeselect, roleDeptTreeselect } from "@/api/system/dept";
@@ -241,6 +247,10 @@ export default {
   name: "Role",
   data() {
     return {
+      // 公众号列表
+      gzhList: [],
+      // 选中框
+      checkList: [],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -320,11 +330,18 @@ export default {
   },
   created() {
     this.getList();
+    this.getUserGZHList()
     this.getDicts("sys_normal_disable").then(response => {
       this.statusOptions = response.data;
     });
   },
   methods: {
+    /** 查询公众号列表 */
+    getUserGZHList(){
+      getGZHlist().then(res => {
+        this.gzhList = res.data
+      })
+    },
     /** 查询角色列表 */
     getList() {
       this.loading = true;
@@ -418,6 +435,7 @@ export default {
         status: "0",
         menuIds: [],
         deptIds: [],
+        mpScope: [],
         remark: undefined
       };
       this.resetForm("form");
@@ -455,6 +473,9 @@ export default {
       });
       getRole(roleId).then(response => {
         this.form = response.data;
+        // this.form.mpScope = JSON.parse(this.form.mpScope).map(item => {
+        //   return item + ''
+        // })
         this.open = true;
         this.title = "修改角色";
       });
@@ -467,6 +488,10 @@ export default {
       });
       getRole(row.roleId).then(response => {
         this.form = response.data;
+        this.form.mpScope = JSON.parse(this.form.mpScope).map(item => {
+          return item + ''
+        })
+        console.log('this form', this.form)
         this.openDataScope = true;
         this.title = "分配数据权限";
       });
@@ -505,7 +530,16 @@ export default {
     submitDataScope: function() {
       if (this.form.roleId != undefined) {
         this.form.deptIds = this.getDeptAllCheckedKeys();
-        dataScope(this.form).then(response => {
+        let arr = []
+        arr = this.form.mpScope.map(item => {
+          return Number(item)
+        })
+        // console.log('arr', JSON.stringify(arr))
+        let params = {
+          ...this.form
+        }
+        params.mpScope = JSON.stringify(arr)
+        dataScope(params).then(response => {
           if (response.code === 200) {
             this.msgSuccess("修改成功");
             this.openDataScope = false;

@@ -38,3 +38,13 @@ export function getCodeImg() {
     method: 'get'
   })
 }
+
+//用户可见公众号列表
+export function getGZHlist(name = '') {
+  return request({
+    url: '/wxmp/list',
+    method: 'get',
+    data: { name }
+  })
+}
+
