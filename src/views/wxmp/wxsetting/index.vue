@@ -486,7 +486,7 @@ export default {
     },
     getTemplateList() {
       let params = {
-        type: getCurrentGZH().type
+        type: getCurrentGZH() ? getCurrentGZH().type : ''
       }
       getTemplateList(params).then(res => {
         this.tempList = res.data;
@@ -503,7 +503,8 @@ export default {
       });
     },
     getWechatInfo() {
-      getWechatInfo({ appIdentify: "online_study" }).then(res => {
+      let appIdentify = getCurrentGZH() ? getCurrentGZH().appIdentify : ''
+      getWechatInfo({ appIdentify }).then(res => {
         if (res.data.code === 200) {
           this.appId = res.data.data.wxMp.appId;
           this.currentTemp = res.data.data.template;

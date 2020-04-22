@@ -5,6 +5,9 @@
     transition: margin-left .28s;
     margin-left: $sideBarWidth;
     position: relative;
+    &.hasgzh{
+      margin-left: 0;
+    }
   }
 
   .sidebar-container {
