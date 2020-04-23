@@ -196,7 +196,8 @@ export default {
       },
       actionUrl: "/api/wxmaterial/materialFileUpload",
       headers: {
-        Authorization: "Bearer " + getToken()
+        Authorization: "Bearer " + getToken(),
+          appIdKey: getCurrentGZH().appId
       },
       file: null,
       tempFile: null,

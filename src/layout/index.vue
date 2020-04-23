@@ -21,7 +21,7 @@ import { AppMain, Navbar, Settings, Sidebar, TagsView } from "./components";
 import ResizeMixin from "./mixin/ResizeHandler";
 import { mapState } from "vuex";
 import { getCurrentGZH, setCurrentGZH } from "@/utils/auth";
-import { getGZHlist } from '@/api/login'
+import { getGZHlist } from "@/api/login";
 
 export default {
   name: "Layout",
@@ -35,7 +35,7 @@ export default {
   },
   mixins: [ResizeMixin],
   created() {
-    this.getgzhList()
+    this.getgzhList();
   },
   computed: {
     ...mapState({
@@ -58,29 +58,29 @@ export default {
     }
   },
   methods: {
-        getgzhList() {
+    getgzhList() {
+      if (!getCurrentGZH()) {
+        getGZHlist().then(res => {
+          let list = res.data;
           if (!getCurrentGZH()) {
-            getGZHlist().then(res => {
-              let list = res.data;
-              if (!getCurrentGZH()) {
-                if (list.length > 0) {
-                  setCurrentGZH(list[0]);
-                  this.$store.dispatch("SET_CURRENTGZH", list[0]);
-                }
-              } else {
-                let gzh = getCurrentGZH();
-                let index = list.find(item => {
-                  return item.id === gzh.id;
-                });
-                if (index > 0) {
-                } else {
-                  setCurrentGZH(list[0]);
-                  this.$store.dispatch("SET_CURRENTGZH", list[0]);
-                }
-              }
+            if (list.length > 0) {
+              setCurrentGZH(list[0]);
+              this.$store.dispatch("SET_CURRENTGZH", list[0]);
+            }
+          } else {
+            let gzh = getCurrentGZH();
+            let index = list.find(item => {
+              return item.id === gzh.id;
             });
+            if (index > 0) {
+            } else {
+              setCurrentGZH(list[0]);
+              this.$store.dispatch("SET_CURRENTGZH", list[0]);
+            }
           }
-        },
+        });
+      }
+    },
     handleClickOutside() {
       this.$store.dispatch("app/closeSideBar", { withoutAnimation: false });
     }

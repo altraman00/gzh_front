@@ -177,7 +177,7 @@
   import WxNews from '@/components/wx-news/main.vue'
   import WxMaterialSelect from '@/components/wx-material-select/main.vue'
   import WxVoicePlayer from '@/components/wx-voice-play/main.vue'
-  import { getToken } from '@/utils/auth'
+  import { getToken, getCurrentGZH } from '@/utils/auth'
 
   export default {
     name: "wxReplySelect",
@@ -219,7 +219,8 @@
         },
         actionUrl: '/api/wxmaterial/materialFileUpload',
         headers: {
-          Authorization: 'Bearer ' + getToken()
+          Authorization: 'Bearer ' + getToken(),
+          appIdKey: getCurrentGZH().appId
         }
       }
     },
