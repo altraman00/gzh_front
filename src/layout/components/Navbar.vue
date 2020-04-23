@@ -58,7 +58,7 @@
     </div>
     <el-dialog title="切换公众号" :visible.sync="dialogMsgVisible" width="40%">
       <el-select style="width: 100%" v-model="selectedGZH">
-        <el-option v-for="item in gzhList" :key="item.id" :label="item.appName" :value-key="item.id" :value="item"></el-option>
+        <el-option v-for="item in gzhList" :key="item.id" :label="item.appName" :value-key="item.id" :value="item.id"></el-option>
       </el-select>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogMsgVisible = false">取 消</el-button>
@@ -113,9 +113,14 @@ export default {
   },
   methods: {
     updateGZH () {
-      console.log('current', this.selectedGZH)
-      setCurrentGZH(this.selectedGZH)
-      this.$store.dispatch('SET_CURRENTGZH', this.selectedGZH)
+      let selectedGZH = null
+      this.gzhList.map(item => {
+       if (item.id == this.selectedGZH) {
+         selectedGZH = item
+       }
+      })
+      setCurrentGZH(selectedGZH)
+      this.$store.commit('SET_CURRENTGZH', selectedGZH)
       window.location.reload()
     },
     handleShowModal() {
