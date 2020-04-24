@@ -126,7 +126,7 @@
             v-for="item in tempList"
             :key="item.id"
             :label="item.templateName"
-            :value="item"
+            :value="item.id"
           ></el-option>
         </el-select>
       </div>
@@ -472,7 +472,7 @@ export default {
     handleConfirmModal() {
       const params = {
         appId: this.appId,
-        templateId: this.selectCurrenTemplate.id
+        templateId: this.selectCurrenTemplate
       };
       bindTemplate(params).then(res => {
         if (res.code === 200) {
