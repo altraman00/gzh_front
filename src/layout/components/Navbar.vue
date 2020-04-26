@@ -62,7 +62,7 @@
       </el-select>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogMsgVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogMsgVisible = false;updateGZH()">确 定</el-button>
+        <el-button :disabled="!selectedGZH" type="primary" @click="updateGZH()">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -113,6 +113,9 @@ export default {
   },
   methods: {
     updateGZH () {
+      if (!this.selectedGZH) {
+        return
+      }
       let selectedGZH = null
       this.gzhList.map(item => {
        if (item.id == this.selectedGZH) {
@@ -121,6 +124,7 @@ export default {
       })
       setCurrentGZH(selectedGZH)
       this.$store.commit('SET_CURRENTGZH', selectedGZH)
+      this.dialogMsgVisible = false;
       window.location.reload()
     },
     handleShowModal() {
