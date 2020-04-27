@@ -28,7 +28,7 @@
         </el-tooltip>-->
         <el-tooltip effect="dark" :content="currentGZH ? currentGZH.appName:  '无'" placement="bottom">
           <div class="right-menu-item hover-effect">
-            <el-link type="success"  @click="handleShowModal" class="el-icon-s-promotion">公众号：{{currentGZH ? currentGZH.appName:  '无'}}</el-link>
+            <el-link type="success"  @click="handleShowModal" class="el-icon-s-promotion">公众号：{{currentGZH ? `${currentGZH.appName}（${currentGZH.type == 1 ? '订阅号' : currentGZH.type == 2 ? '服务号': '小程序'}）`:  '无'}}</el-link>
           </div>
         </el-tooltip>
         <screenfull id="screenfull" class="right-menu-item hover-effect" />
