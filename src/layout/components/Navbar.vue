@@ -58,7 +58,7 @@
     </div>
     <el-dialog title="切换公众号" :visible.sync="dialogMsgVisible" width="40%">
       <el-select style="width: 100%" v-model="selectedGZH">
-        <el-option v-for="item in gzhList" :key="item.id" :label="item.appName" :value-key="item.id" :value="item.id"></el-option>
+        <el-option v-for="item in gzhList" :key="item.id" :label="`${item.appName}（${item.type == 1 ? '订阅号' : item.type == 2 ? '服务号': '小程序'}）`" :value-key="item.id" :value="item.id"></el-option>
       </el-select>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogMsgVisible = false">取 消</el-button>
