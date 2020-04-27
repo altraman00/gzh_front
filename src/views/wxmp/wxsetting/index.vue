@@ -132,7 +132,7 @@
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogShow = false">取 消</el-button>
-        <el-button type="primary" @click="handleConfirmModal">确 定</el-button>
+        <el-button :disabled="!selectCurrenTemplate" type="primary" @click="handleConfirmModal">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -509,6 +509,7 @@ export default {
         if (res.data.code === 200) {
           this.appId = res.data.data.wxMp.appId;
           this.currentTemp = res.data.data.template;
+          this.selectCurrenTemplate = this.currentTemp.id
           this.active = res.data.data.wxMp.activityEnable;
           if (this.currentTemp) {
             this.getMsgTemplateList();
