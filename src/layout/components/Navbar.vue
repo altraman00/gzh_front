@@ -131,6 +131,7 @@ export default {
       this.dialogMsgVisible = true
       getGZHlist().then(res => {
         this.gzhList = res.data
+        this.selectedGZH = getCurrentGZH() ? getCurrentGZH().id : null
       })
     },
     toggleSideBar() {
