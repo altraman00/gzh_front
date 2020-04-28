@@ -435,7 +435,7 @@ export default {
         status: "0",
         menuIds: [],
         deptIds: [],
-        mpScope: [],
+        mpScope: null,
         remark: undefined
       };
       this.resetForm("form");
@@ -491,7 +491,6 @@ export default {
         this.form.mpScope = JSON.parse(this.form.mpScope).map(item => {
           return item + ''
         })
-        console.log('this form', this.form)
         this.openDataScope = true;
         this.title = "分配数据权限";
       });
@@ -538,7 +537,7 @@ export default {
         let params = {
           ...this.form
         }
-        params.mpScope = JSON.stringify(arr)
+        (params.mpScope && params.mpScope.length > 0) ? params.mpScope = JSON.stringify(arr) : null
         dataScope(params).then(response => {
           if (response.code === 200) {
             this.msgSuccess("修改成功");
