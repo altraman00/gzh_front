@@ -225,7 +225,12 @@
         </el-form-item>
         <el-form-item label="公众号权限">
           <el-checkbox-group v-model="form.mpScope">
-            <el-checkbox v-for="gzh in gzhList" :key="gzh.id" :label="gzh.id" :value="gzh.id">{{gzh.appName}}</el-checkbox>
+            <el-checkbox
+              v-for="gzh in gzhList"
+              :key="gzh.id"
+              :label="gzh.id"
+              :value="gzh.id"
+            >{{gzh.appName}}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
       </el-form>
@@ -238,10 +243,25 @@
 </template>
 
 <script>
-import { getGZHlist } from '@/api/login'
-import { listRole, getRole, delRole, addRole, updateRole, exportRole, dataScope, changeRoleStatus } from "@/api/system/role";
-import { treeselect as menuTreeselect, roleMenuTreeselect } from "@/api/system/menu";
-import { treeselect as deptTreeselect, roleDeptTreeselect } from "@/api/system/dept";
+import { getGZHlist } from "@/api/login";
+import {
+  listRole,
+  getRole,
+  delRole,
+  addRole,
+  updateRole,
+  exportRole,
+  dataScope,
+  changeRoleStatus
+} from "@/api/system/role";
+import {
+  treeselect as menuTreeselect,
+  roleMenuTreeselect
+} from "@/api/system/menu";
+import {
+  treeselect as deptTreeselect,
+  roleDeptTreeselect
+} from "@/api/system/dept";
 
 export default {
   name: "Role",
@@ -330,17 +350,17 @@ export default {
   },
   created() {
     this.getList();
-    this.getUserGZHList()
+    this.getUserGZHList();
     this.getDicts("sys_normal_disable").then(response => {
       this.statusOptions = response.data;
     });
   },
   methods: {
     /** 查询公众号列表 */
-    getUserGZHList(){
+    getUserGZHList() {
       getGZHlist().then(res => {
-        this.gzhList = res.data
-      })
+        this.gzhList = res.data;
+      });
     },
     /** 查询角色列表 */
     getList() {
@@ -400,15 +420,22 @@ export default {
     // 角色状态修改
     handleStatusChange(row) {
       let text = row.status === "0" ? "启用" : "停用";
-      this.$confirm('确认要"' + text + '""' + row.roleName + '"角色吗?', "警告", {
+      this.$confirm(
+        '确认要"' + text + '""' + row.roleName + '"角色吗?',
+        "警告",
+        {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
-        }).then(function() {
+        }
+      )
+        .then(function() {
           return changeRoleStatus(row.roleId, row.status);
-        }).then(() => {
+        })
+        .then(() => {
           this.msgSuccess(text + "成功");
-        }).catch(function() {
+        })
+        .catch(function() {
           row.status = row.status === "0" ? "1" : "0";
         });
     },
@@ -435,7 +462,7 @@ export default {
         status: "0",
         menuIds: [],
         deptIds: [],
-        mpScope: null,
+        mpScope: [],
         remark: undefined
       };
       this.resetForm("form");
@@ -453,9 +480,9 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.roleId)
-      this.single = selection.length!=1
-      this.multiple = !selection.length
+      this.ids = selection.map(item => item.roleId);
+      this.single = selection.length != 1;
+      this.multiple = !selection.length;
     },
     /** 新增按钮操作 */
     handleAdd() {
@@ -467,7 +494,7 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      const roleId = row.roleId || this.ids
+      const roleId = row.roleId || this.ids;
       this.$nextTick(() => {
         this.getRoleMenuTreeselect(roleId);
       });
@@ -489,8 +516,8 @@ export default {
       getRole(row.roleId).then(response => {
         this.form = response.data;
         this.form.mpScope = JSON.parse(this.form.mpScope).map(item => {
-          return item + ''
-        })
+          return item + "";
+        });
         this.openDataScope = true;
         this.title = "分配数据权限";
       });
@@ -501,7 +528,12 @@ export default {
         if (valid) {
           if (this.form.roleId != undefined) {
             this.form.menuIds = this.getMenuAllCheckedKeys();
-            updateRole(this.form).then(response => {
+
+            let params = {
+              ...this.form
+            };
+            delete params.mpScope
+            updateRole(params).then(response => {
               if (response.code === 200) {
                 this.msgSuccess("修改成功");
                 this.open = false;
@@ -512,7 +544,12 @@ export default {
             });
           } else {
             this.form.menuIds = this.getMenuAllCheckedKeys();
-            addRole(this.form).then(response => {
+           
+            let params = {
+              ...this.form
+            };
+          delete params.mpScope
+            addRole(params).then(response => {
               if (response.code === 200) {
                 this.msgSuccess("新增成功");
                 this.open = false;
@@ -529,15 +566,20 @@ export default {
     submitDataScope: function() {
       if (this.form.roleId != undefined) {
         this.form.deptIds = this.getDeptAllCheckedKeys();
-        let arr = []
+        let arr = [];
         arr = this.form.mpScope.map(item => {
-          return Number(item)
-        })
-        // console.log('arr', JSON.stringify(arr))
+          return Number(item);
+        });
+
         let params = {
           ...this.form
+        };
+        console.log('arr', arr)
+        if (arr.length === 0) {
+          params.mpScope = "[]"
+        } else {
+          params.mpScope = JSON.stringify(arr)
         }
-        (params.mpScope && params.mpScope.length > 0) ? params.mpScope = JSON.stringify(arr) : null
         dataScope(params).then(response => {
           if (response.code === 200) {
             this.msgSuccess("修改成功");
@@ -552,29 +594,39 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const roleIds = row.roleId || this.ids;
-      this.$confirm('是否确认删除角色编号为"' + roleIds + '"的数据项?', "警告", {
+      this.$confirm(
+        '是否确认删除角色编号为"' + roleIds + '"的数据项?',
+        "警告",
+        {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
-        }).then(function() {
+        }
+      )
+        .then(function() {
           return delRole(roleIds);
-        }).then(() => {
+        })
+        .then(() => {
           this.getList();
           this.msgSuccess("删除成功");
-        }).catch(function() {});
+        })
+        .catch(function() {});
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有角色数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$confirm("是否确认导出所有角色数据项?", "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(function() {
           return exportRole(queryParams);
-        }).then(response => {
+        })
+        .then(response => {
           this.download(response.msg);
-        }).catch(function() {});
+        })
+        .catch(function() {});
     }
   }
 };
