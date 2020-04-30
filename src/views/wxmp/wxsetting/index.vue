@@ -126,13 +126,13 @@
             v-for="item in tempList"
             :key="item.id"
             :label="item.templateName"
-            :value="item"
+            :value="item.id"
           ></el-option>
         </el-select>
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogShow = false">取 消</el-button>
-        <el-button type="primary" @click="handleConfirmModal">确 定</el-button>
+        <el-button :disabled="!selectCurrenTemplate" type="primary" @click="handleConfirmModal">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -150,6 +150,7 @@ import {
 } from "@/api/wxmp/wxsetting";
 import { getToken } from "@/utils/auth";
 import { getWechatInfo } from "@/api/test";
+import { getCurrentGZH, setCurrentGZH } from '@/utils/auth'
 export default {
   components: {},
   data() {
@@ -195,7 +196,8 @@ export default {
       },
       actionUrl: "/api/wxmaterial/materialFileUpload",
       headers: {
-        Authorization: "Bearer " + getToken()
+        Authorization: "Bearer " + getToken(),
+          appIdKey: getCurrentGZH().appId
       },
       file: null,
       tempFile: null,
@@ -470,7 +472,7 @@ export default {
     handleConfirmModal() {
       const params = {
         appId: this.appId,
-        templateId: this.selectCurrenTemplate.id
+        templateId: this.selectCurrenTemplate
       };
       bindTemplate(params).then(res => {
         if (res.code === 200) {
@@ -484,7 +486,10 @@ export default {
       });
     },
     getTemplateList() {
-      getTemplateList().then(res => {
+      let params = {
+        type: getCurrentGZH() ? getCurrentGZH().type : ''
+      }
+      getTemplateList(params).then(res => {
         this.tempList = res.data;
       });
     },
@@ -499,10 +504,12 @@ export default {
       });
     },
     getWechatInfo() {
-      getWechatInfo({ appIdentify: "online_study" }).then(res => {
+      let appIdentify = getCurrentGZH() ? getCurrentGZH().appIdentify : ''
+      getWechatInfo({ appIdentify }).then(res => {
         if (res.data.code === 200) {
           this.appId = res.data.data.wxMp.appId;
           this.currentTemp = res.data.data.template;
+          this.selectCurrenTemplate = this.currentTemp.id
           this.active = res.data.data.wxMp.activityEnable;
           if (this.currentTemp) {
             this.getMsgTemplateList();

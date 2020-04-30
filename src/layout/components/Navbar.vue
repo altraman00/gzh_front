@@ -1,6 +1,11 @@
 <template>
   <div class="navbar">
-    <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
+    <hamburger
+      id="hamburger-container"
+      :is-active="sidebar.opened"
+      class="hamburger-container"
+      @toggleClick="toggleSideBar"
+    />
 
     <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
 
@@ -20,10 +25,10 @@
 
         <el-tooltip content="文档地址" effect="dark" placement="bottom">
           <ruo-yi-doc id="ruoyi-doc" class="right-menu-item hover-effect" />
-        </el-tooltip> -->
-        <el-tooltip effect="dark" content="尚德在线学堂" placement="bottom">
+        </el-tooltip>-->
+        <el-tooltip effect="dark" :content="currentGZH ? currentGZH.appName:  '无'" placement="bottom">
           <div class="right-menu-item hover-effect">
-            <el-link type="success" href="#" target="_blank" class="el-icon-s-promotion">公众号：尚德在线学堂</el-link>
+            <el-link type="success"  @click="handleShowModal" class="el-icon-s-promotion">公众号：{{currentGZH ? `${currentGZH.appName}（${currentGZH.type == 1 ? '订阅号' : currentGZH.type == 2 ? '服务号': '小程序'}）`:  '无'}}</el-link>
           </div>
         </el-tooltip>
         <screenfull id="screenfull" class="right-menu-item hover-effect" />
@@ -31,12 +36,11 @@
         <el-tooltip content="布局大小" effect="dark" placement="bottom">
           <size-select id="size-select" class="right-menu-item hover-effect" />
         </el-tooltip>
-
       </template>
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatar" class="user-avatar">
+          <img :src="avatar" class="user-avatar" />
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -52,18 +56,29 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+    <el-dialog title="切换公众号" :visible.sync="dialogMsgVisible" width="40%">
+      <el-select style="width: 100%" v-model="selectedGZH">
+        <el-option v-for="item in gzhList" :key="item.id" :label="`${item.appName}（${item.type == 1 ? '订阅号' : item.type == 2 ? '服务号': '小程序'}）`" :value-key="item.id" :value="item.id"></el-option>
+      </el-select>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogMsgVisible = false">取 消</el-button>
+        <el-button :disabled="!selectedGZH" type="primary" @click="updateGZH()">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import Breadcrumb from '@/components/Breadcrumb'
-import Hamburger from '@/components/Hamburger'
-import Screenfull from '@/components/Screenfull'
-import SizeSelect from '@/components/SizeSelect'
-import Search from '@/components/HeaderSearch'
-import RuoYiGit from '@/components/RuoYi/Git'
-import RuoYiDoc from '@/components/RuoYi/Doc'
+import { mapGetters } from "vuex";
+import { getGZHlist } from '@/api/login'
+import { getCurrentGZH, setCurrentGZH } from '@/utils/auth'
+import Breadcrumb from "@/components/Breadcrumb";
+import Hamburger from "@/components/Hamburger";
+import Screenfull from "@/components/Screenfull";
+import SizeSelect from "@/components/SizeSelect";
+import Search from "@/components/HeaderSearch";
+import RuoYiGit from "@/components/RuoYi/Git";
+import RuoYiDoc from "@/components/RuoYi/Doc";
 
 export default {
   components: {
@@ -75,41 +90,66 @@ export default {
     RuoYiGit,
     RuoYiDoc
   },
+  data() {
+    return {
+      dialogMsgVisible: false,
+      selectedGZH: null,
+      gzhList: []
+    };
+  },
   computed: {
-    ...mapGetters([
-      'sidebar',
-      'avatar',
-      'device'
-    ]),
+    ...mapGetters(["sidebar", "avatar", "device", "currentGZH"]),
     setting: {
       get() {
-        return this.$store.state.settings.showSettings
+        return this.$store.state.settings.showSettings;
       },
       set(val) {
-        this.$store.dispatch('settings/changeSetting', {
-          key: 'showSettings',
+        this.$store.dispatch("settings/changeSetting", {
+          key: "showSettings",
           value: val
-        })
+        });
       }
     }
   },
   methods: {
+    updateGZH () {
+      if (!this.selectedGZH) {
+        return
+      }
+      let selectedGZH = null
+      this.gzhList.map(item => {
+       if (item.id == this.selectedGZH) {
+         selectedGZH = item
+       }
+      })
+      setCurrentGZH(selectedGZH)
+      this.$store.commit('SET_CURRENTGZH', selectedGZH)
+      this.dialogMsgVisible = false;
+      window.location.reload()
+    },
+    handleShowModal() {
+      this.dialogMsgVisible = true
+      getGZHlist().then(res => {
+        this.gzhList = res.data
+        this.selectedGZH = getCurrentGZH() ? getCurrentGZH().id : null
+      })
+    },
     toggleSideBar() {
-      this.$store.dispatch('app/toggleSideBar')
+      this.$store.dispatch("app/toggleSideBar");
     },
     async logout() {
-      this.$confirm('确定注销并退出系统吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
+      this.$confirm("确定注销并退出系统吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
       }).then(() => {
-        this.$store.dispatch('LogOut').then(() => {
-          location.reload()
-        })
-      })
+        this.$store.dispatch("LogOut").then(() => {
+          location.reload();
+        });
+      });
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -118,18 +158,18 @@ export default {
   overflow: hidden;
   position: relative;
   background: #fff;
-  box-shadow: 0 1px 4px rgba(0,21,41,.08);
+  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
 
   .hamburger-container {
     line-height: 46px;
     height: 100%;
     float: left;
     cursor: pointer;
-    transition: background .3s;
-    -webkit-tap-highlight-color:transparent;
+    transition: background 0.3s;
+    -webkit-tap-highlight-color: transparent;
 
     &:hover {
-      background: rgba(0, 0, 0, .025)
+      background: rgba(0, 0, 0, 0.025);
     }
   }
 
@@ -161,10 +201,10 @@ export default {
 
       &.hover-effect {
         cursor: pointer;
-        transition: background .3s;
+        transition: background 0.3s;
 
         &:hover {
-          background: rgba(0, 0, 0, .025)
+          background: rgba(0, 0, 0, 0.025);
         }
       }
     }

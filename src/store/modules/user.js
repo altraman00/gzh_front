@@ -1,9 +1,10 @@
-import { login, logout, getInfo } from '@/api/login'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { login, logout, getInfo, getGZHlist } from '@/api/login'
+import { getToken, setToken, removeToken, getCurrentGZH, setCurrentGZH } from '@/utils/auth'
 
 const user = {
   state: {
     token: getToken(),
+    gzh: getCurrentGZH(),
     name: '',
     avatar: '',
     roles: [],
@@ -25,6 +26,9 @@ const user = {
     },
     SET_PERMISSIONS: (state, permissions) => {
       state.permissions = permissions
+    },
+    SET_CURRENTGZH: (state, gzh) => {
+      state.gzh = gzh
     }
   },
 
@@ -37,6 +41,25 @@ const user = {
       const uuid = userInfo.uuid
       return new Promise((resolve, reject) => {
         login(username, password, code, uuid).then(res => {
+          getGZHlist().then(res => {
+            let list = res.data
+            if (!getCurrentGZH()) {
+              if (list.length > 0) {
+                setCurrentGZH(list[0])
+                commit('SET_CURRENTGZH', list[0])
+              }
+            } else {
+              let gzh = getCurrentGZH()
+              let index = list.find(item => {
+                return item.id === gzh.id
+              })
+              if (index > 0) {
+              } else {
+                setCurrentGZH(list[0])
+                commit('SET_CURRENTGZH', list[0])
+              }
+            }
+          })
           setToken(res.token)
           commit('SET_TOKEN', res.token)
           resolve()

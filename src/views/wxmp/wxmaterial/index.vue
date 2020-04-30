@@ -312,7 +312,7 @@
   import WxEditor from '@/components/Editor/WxEditor.vue'
   import WxNews from '@/components/wx-news/main.vue'
   import WxMaterialSelect from '@/components/wx-material-select/main.vue'
-  import { getToken } from '@/utils/auth'
+  import { getToken, getCurrentGZH } from '@/utils/auth'
 
   export default {
     name: 'wxmaterial',
@@ -338,7 +338,8 @@
         tableLoading: false,
         actionUrl: '/api/wxmaterial/materialFileUpload',
         headers: {
-          Authorization: 'Bearer ' + getToken()
+          Authorization: 'Bearer ' + getToken(),
+          appIdKey: getCurrentGZH().appId
         },
         fileList:[],
         dialogVideoVisible:false,

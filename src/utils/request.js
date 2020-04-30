@@ -3,6 +3,7 @@ import { Notification, MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 import user from '@/store/modules/user'
+import { getCurrentGZH } from './auth'
 
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 // 创建axios实例
@@ -32,6 +33,9 @@ service.interceptors.request.use(
     }
     if (getToken()) {
       config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+    }
+    if (getCurrentGZH()) {
+      config.headers['appIdKey'] = getCurrentGZH().appId
     }
     return config
   },
