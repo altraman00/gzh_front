@@ -55,7 +55,7 @@
         </el-table-column>
       </el-table>
     </div>
-    <el-dialog title="编辑海报" :visible.sync="editPosterModalShow">
+    <el-dialog :title="selectedTmp && selectedTmp.repType === 'poster' ? '编辑海报' : '编辑图片'" :visible.sync="editPosterModalShow">
       <div style="text-align:center;" v-if="selectedTmp" class="msg-main">
         <el-form>
           <p style="text-align:left;font-weight:600">海报底图上传</p>
@@ -171,7 +171,7 @@
         <el-button type="primary" @click="confirmEditPosterModal">确 定</el-button>
       </div>
     </el-dialog>
-    <el-dialog :title="selectedTmp.repType === 'poster' ? '预览海报' : '预览图片'" :visible.sync="previewPosterModalShow">
+    <el-dialog :title="selectedTmp && selectedTmp.repType === 'poster' ? '预览海报' : '预览图片'" :visible.sync="previewPosterModalShow">
       <div v-loading="loading" style="text-align:center;" v-if="selectedTmp" class="msg-main">
         <img :src="currentPoster" style="max-width:400px;max-height:400px;" />
         <p>{{selectedTmp.remark}}</p>
