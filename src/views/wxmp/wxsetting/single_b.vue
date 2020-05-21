@@ -1,72 +1,62 @@
 <template>
-  <div class="app-container">
-    <div class="toolbar">
-      <div class="left">
+  <div :class="{'nodata': !currentTemp}" class="app-container">
+    <div v-if="!currentTemp" class="nodata-setting">
+      <p>暂未配置运营活动，请先点击配置</p>
+      <el-button type="primary" @click="dialogShow = true">配置运营活动</el-button>
+    </div>
+    <div v-if="currentTemp" class="toolbar">
+      <div v-if="currentTemp" class="left">
         当前活动：
         <span class="activity-name">{{currentTemp.templateName}}</span>
-        <span :class="{paused: !currentTemp.activityEnable}" class="status">{{currentTemp.activityEnable ? '活动进行中' : '活动已暂停'}}</span>
+        <span :class="{paused: !active}" class="status">{{active ? '活动进行中' : '活动暂停中'}}</span>
       </div>
       <div class="right">
-        <!-- <el-button @click="handleToggleActivity">{{active ? '活动暂停' : '活动继续'}}</el-button> -->
-        <!-- <el-button @click="handleChangeTemplate" type="primary">切换活动模板</el-button> -->
-
-        <el-dropdown>
-          <el-button size="mini" type="primary">
-            切换活动模板<i class="el-icon-arrow-down el-icon--right"></i>
-          </el-button>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item
-              v-for="item in tempList"
-              :key="item.id"
-              @click.native="changeTemp(item)"
-            >{{item.templateName}}</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-
+        <el-button @click="handleToggleActivity">{{active ? '活动暂停' : '活动继续'}}</el-button>
+        <el-button @click="handleChangeTemplate" type="primary">切换活动模板</el-button>
       </div>
     </div>
+    <!-- <avue-crud ref="crud" :data="tableData" :option="tableOption" :page="page"></avue-crud> -->
+    <div v-if="currentTemp" class="content">
+      <el-table :data="tableData" stripe style="width: 100%;white-space:pre-line;">
+        <el-table-column type="index" label="序号" align="center" width="80"></el-table-column>
+        <el-table-column prop="repTypeDesc" label="类型" width="80"></el-table-column>
+        <el-table-column prop="title" label="标题"></el-table-column>
+        <el-table-column label="内容">
+          <template slot-scope="scope">
+            <div v-if="scope.row.repType === 'text' || scope.row.repType === 'schedule'" v-html="scope.row.repContent"></div>
+            <img
+              style="max-width: 201px;max-height: 201px;"
+              v-if="scope.row.repType === 'poster'"
+              :src="scope.row.repContent"
+              alt
+            />
+          </template>
+        </el-table-column>
+        <el-table-column prop="remark" label="备注"></el-table-column>
+        <el-table-column label="操作" width="160">
+          <template slot-scope="scope">
+            <a
+            style="color: #409EFF;cursor: pointer;margin-right: 12px;"
+              v-if="scope.row.repType === 'poster'"
+              @click="handlePreviewPosterModal(scope.row)"
+              size="mini"
+              type="primary"
+            >预览</a>
+            <a style="color: #409EFF;cursor: pointer;" size="mini" @click="handleEditTmp(scope.row)">编辑</a>
 
-    <el-table :data="tableData" stripe style="width: 100%;white-space:pre-line;">
-      <el-table-column type="index" label="序号" align="center" width="80"></el-table-column>
-      <el-table-column prop="repTypeDesc" label="类型" width="80"></el-table-column>
-      <el-table-column prop="title" label="标题"></el-table-column>
-      <el-table-column label="内容">
-        <template slot-scope="scope">
-          <div v-if="scope.row.repType === 'text' || scope.row.repType === 'schedule'" v-html="scope.row.repContent"></div>
-          <img
-            style="max-width: 201px;max-height: 201px;"
-            v-if="scope.row.repType === 'poster'"
-            :src="scope.row.repContent"
-            alt
-          />
-        </template>
-      </el-table-column>
-      <el-table-column prop="remark" label="备注"></el-table-column>
-      <el-table-column label="操作" width="160">
-        <template slot-scope="scope">
-          <a
-          style="color: #409EFF;cursor: pointer;margin-right: 12px;"
-            v-if="scope.row.repType === 'poster'"
-            @click="handlePreviewPosterModal(scope.row)"
-            size="mini"
-            type="primary"
-          >预览</a>
-          <a style="color: #409EFF;cursor: pointer;" size="mini" @click="handleEditTmp(scope.row)">编辑</a>
-
-          <!-- <el-button size="mini" type="danger">删除</el-button> -->
-        </template>
-      </el-table-column>
-      <el-table-column label="启用/禁用" width="80">
-        <template slot-scope="scope">
-          <el-switch
-            @change="handleEnableChange(scope.row)"
-            v-model="scope.row.activityEnable"
-            active-color="#13ce66">
-          </el-switch>
-        </template>
-      </el-table-column>
-    </el-table>
-
+            <!-- <el-button size="mini" type="danger">删除</el-button> -->
+          </template>
+        </el-table-column>
+        <el-table-column label="启用/禁用" width="80" @change="">
+          <template slot-scope="scope">
+            <el-switch
+              v-model="scope.row.status"
+              active-color="#13ce66">
+            </el-switch>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
     <el-dialog title="编辑海报" :visible.sync="editPosterModalShow">
       <div style="text-align:center;" v-if="selectedTmp" class="msg-main">
         <el-form>
@@ -117,16 +107,12 @@
         <el-button type="primary" @click="confirmEditPosterModal">确 定</el-button>
       </div>
     </el-dialog>
-
-
     <el-dialog title="预览海报" :visible.sync="previewPosterModalShow">
       <div v-loading="loading" style="text-align:center;" v-if="selectedTmp" class="msg-main">
         <img :src="currentPoster" style="max-width:400px;max-height:400px;" />
         <p>{{selectedTmp.remark}}</p>
       </div>
     </el-dialog>
-
-
     <el-dialog :title="selectedTmp ? selectedTmp.repType === 'schedule' ? '编辑定时任务':'编辑消息':'编辑消息'" :visible.sync="editTextModalShow">
       <div v-if="selectedTmp" class="msg-main">
         <p style="font-weight: 600;margin-bottom: 10px;">标题： <span style="font-weight: 400;">{{selectedTmp.title}}</span></p>
@@ -141,8 +127,6 @@
         <el-button type="primary" @click="confirmEditTextModal">确 定</el-button>
       </div>
     </el-dialog>
-
-
     <el-dialog title="配置运营活动" :visible.sync="dialogShow">
       <div class="msg-main">
         <p>选择活动模板</p>
@@ -171,16 +155,13 @@ import {
   bindTemplate,
   editTemplate,
   toggleActivity,
-  previewPoster,
-  changeSingleTemplateStatus,
-  getAllTemplateList
+  previewPoster
 } from "@/api/wxmp/wxsetting";
 import { getToken } from "@/utils/auth";
 import { getWechatInfo } from "@/api/test";
 import { getCurrentGZH, setCurrentGZH } from '@/utils/auth'
 export default {
   components: {},
-  props: ['templateId'],
   data() {
     return {
       selectCurrenTemplate: null,
@@ -213,7 +194,7 @@ export default {
       tempList: [],
       tableData: [],
       appId: "wx9047d074c6a5a211",
-      currentTemp: {},
+      currentTemp: null,
       tableOption: tableOption,
       page: {
         total: 0, // 总页数
@@ -245,12 +226,14 @@ export default {
     };
   },
   methods: {
-    // handleChangeTemplate () {
-    //   this.dialogShow = true
-    // },
-    changeTemp(temp) {
-      this.currentTemp = temp;
-      this.getMsgTemplateList();
+    handleChangeTemplate () {
+      this.$confirm('切换后当前活动不可用，是否切换活动模板？', '切换活动模板', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.dialogShow = true
+      })
     },
     checkoutQrcodeCoordinate () {
       if (this.selectedTmp && this.selectedTmp.qrcodeCoordinate) {
@@ -511,39 +494,16 @@ export default {
         }
       });
     },
-    //启用暂停消息
-    handleEnableChange(item) {
-      changeSingleTemplateStatus(item.id, item.activityEnable).then(res => {
-        if(res.code == 200) {
-          this.$message({
-            message: '操作成功',
-            type: 'success'
-          })
-        } else {
-          this.getMsgTemplateList()
-        }
-      })
-    },
     getTemplateList() {
-      // let params = {
-      //   type: getCurrentGZH() ? getCurrentGZH().type : ''
-      // }
-      // getTemplateList(params).then(res => {
-      //   this.tempList = res.data;
-      // });
-      getAllTemplateList({
-        appId: getCurrentGZH().appId
-      }).then(res => {
+      let params = {
+        type: getCurrentGZH() ? getCurrentGZH().type : ''
+      }
+      getTemplateList(params).then(res => {
         this.tempList = res.data;
-        for(var i = 0, len = this.tempList.length; i < len; i++) {
-          if(this.tempList[i].id === this.currentTemp.id) {
-            this.currentTemp = this.tempList[i];
-          }
-        }
-      })
+      });
     },
     getMsgTemplateList() {
-      getMsgTemplateList({ appId: getCurrentGZH().appId, id: this.currentTemp.id }).then(res => {
+      getMsgTemplateList({ appId: this.appId }).then(res => {
         this.tableData = res.data.map(item => {
           return {
             ...item,
@@ -557,21 +517,19 @@ export default {
       getWechatInfo({ appIdentify }).then(res => {
         if (res.data.code === 200) {
           this.appId = res.data.data.wxMp.appId;
-          // this.currentTemp = res.data.data.template;
+          this.currentTemp = res.data.data.template;
           this.selectCurrenTemplate = this.currentTemp.id
           this.active = res.data.data.wxMp.activityEnable;
-          // if (this.currentTemp) {
-          //   this.getMsgTemplateList();
-          // }
+          if (this.currentTemp) {
+            this.getMsgTemplateList();
+          }
         }
       });
     }
   },
   created() {
-    // this.getWechatInfo();
-    this.currentTemp.id = this.templateId;
+    this.getWechatInfo();
     this.getTemplateList();
-    this.getMsgTemplateList();
     // getMsgTemplateList({ appId: 'wx9047d074c6a5a211' })
   }
 };
@@ -597,7 +555,6 @@ export default {
     font-size: 14px;
     color: #495060;
     justify-content: space-between;
-    margin-bottom: 10px;
     span.status {
       color: #67c23a;
       display: inline-block;
