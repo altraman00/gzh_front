@@ -103,8 +103,5 @@ export const changeTemplateStatus = (id, isEnable) => {
 }
 
 export const deleteTemplete = id => {
-  return request({
-    url: `/wxmp/activity/template/delete/${id}`,
-    method: 'post'
-  })
+  return request.delete(`/wxmp/activity/template/delete/${id}`)
 }

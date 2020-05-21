@@ -6,10 +6,9 @@
         <span class="activity-name">{{currentTemp.templateName}}</span>
         <span :class="{paused: !currentTemp.activityEnable}" class="status">{{currentTemp.activityEnable ? '活动进行中' : '活动已暂停'}}</span>
       </div>
-      <div class="right">
-        <!-- <el-button @click="handleToggleActivity">{{active ? '活动暂停' : '活动继续'}}</el-button> -->
+      <div class="right" style="position:relative;top:-5px;">
+        <el-button size="mini" @click="handleActivityEnable">{{currentTemp.activityEnable ? '活动暂停' : '活动继续'}}</el-button>
         <!-- <el-button @click="handleChangeTemplate" type="primary">切换活动模板</el-button> -->
-
         <el-dropdown>
           <el-button size="mini" type="primary">
             切换活动模板<i class="el-icon-arrow-down el-icon--right"></i>
@@ -173,7 +172,8 @@ import {
   toggleActivity,
   previewPoster,
   changeSingleTemplateStatus,
-  getAllTemplateList
+  getAllTemplateList,
+  changeTemplateStatus
 } from "@/api/wxmp/wxsetting";
 import { getToken } from "@/utils/auth";
 import { getWechatInfo } from "@/api/test";
@@ -248,6 +248,14 @@ export default {
     // handleChangeTemplate () {
     //   this.dialogShow = true
     // },
+    handleActivityEnable() {
+      let isEnable = !this.currentTemp.activityEnable;
+      changeTemplateStatus(this.currentTemp.id, isEnable).then(res => {
+        if(res.code == 200) {
+          this.currentTemp.activityEnable = isEnable;
+        }
+      })
+    },
     changeTemp(temp) {
       this.currentTemp = temp;
       this.getMsgTemplateList();
