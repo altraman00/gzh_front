@@ -65,9 +65,9 @@
         </div>
       </el-dialog> -->
 
-      <el-dialog title="配置运营活动" :visible.sync="dialogShow">
+      <el-dialog title="添加活动模板" :visible.sync="dialogShow">
         <div class="msg-main">
-          <p>选择活动模板</p>
+          <span>选择活动模板：</span>
           <el-select v-model="selectCurrenTemplate">
             <el-option
               v-for="item in tempList"
