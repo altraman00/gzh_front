@@ -42,7 +42,7 @@
         </el-table-column>
       </el-table>
 
-      <el-dialog title="添加活动模板" width="500px" :visible.sync="dialogShow">
+      <!-- <el-dialog title="添加活动模板" width="500px" :visible.sync="dialogShow">
         <div class="">
           <p>
             <label style="width: 100px;display:inline-block;text-align:right;">活动名称：</label>
@@ -63,7 +63,26 @@
           <el-button @click="dialogShow=false">取消</el-button>
           <el-button type="primary" @click="add">保存</el-button>
         </div>
+      </el-dialog> -->
+
+      <el-dialog title="配置运营活动" :visible.sync="dialogShow">
+        <div class="msg-main">
+          <p>选择活动模板</p>
+          <el-select v-model="selectCurrenTemplate">
+            <el-option
+              v-for="item in tempList"
+              :key="item.id"
+              :label="item.templateName"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </div>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogShow = false">取 消</el-button>
+          <el-button :disabled="!selectCurrenTemplate" type="primary" @click="handleConfirmModal">确 定</el-button>
+        </div>
       </el-dialog>
+
     </div>
 
 
@@ -75,7 +94,9 @@ import moment from 'moment';
 import {
   getAllTemplateList,
   changeTemplateStatus,
-  deleteTemplete
+  deleteTemplete,
+  getTemplateList,
+  bindTemplate
 } from "@/api/wxmp/wxsetting";
 import { getCurrentGZH, setCurrentGZH } from '@/utils/auth'
 import Single from './single'
@@ -94,13 +115,22 @@ export default {
         title: '',
         startDate: ''
       },
-      chosenTemplateId: ''
+      chosenTemplateId: '',
+      tempList: [],
+      selectCurrenTemplate: ''
     }
   },
   created() {
     this.getList()
   },
   methods: {
+    getAll() {
+      getTemplateList({
+        type: ''
+      }).then(res => {
+        this.tempList = res.data;
+      });
+    },
     getList() {
       this.loading = true;
       getAllTemplateList({
@@ -110,7 +140,24 @@ export default {
         this.tableData = res.data;
       })
     },
+    handleConfirmModal() {
+      const params = {
+        appId: getCurrentGZH().appId,
+        templateId: this.selectCurrenTemplate
+      };
+      bindTemplate(params).then(res => {
+        if (res.code === 200) {
+          this.$message({
+            message: "操作成功",
+            type: "success"
+          });
+          this.dialogShow = false;
+          this.getList();
+        }
+      });
+    },
     addClick() {
+      this.getAll();
       this.dialogShow = true;
     },
     add() {
