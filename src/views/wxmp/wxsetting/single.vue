@@ -707,18 +707,16 @@ export default {
       });
     },
     getWechatInfo() {
-      let appIdentify = getCurrentGZH() ? getCurrentGZH().appIdentify : ''
-      getWechatInfo({ appIdentify }).then(res => {
-        if (res.data.code === 200) {
-          this.appId = res.data.data.wxMp.appId;
-          // this.currentTemp = res.data.data.template;
-          this.selectCurrenTemplate = this.currentTemp.id
-          this.active = res.data.data.wxMp.activityEnable;
-          // if (this.currentTemp) {
-          //   this.getMsgTemplateList();
-          // }
-        }
-      });
+      this.getMsgTemplateList();
+      // let appIdentify = getCurrentGZH() ? getCurrentGZH().appIdentify : ''
+      // getWechatInfo({ appIdentify }).then(res => {
+      //   if (res.data.code === 200) {
+      //     this.appId = res.data.data.wxMp.appId;
+      //     this.active = res.data.data.wxMp.activityEnable;
+      //     this.selectCurrenTemplate = this.currentTemp.id;
+      //     this.getMsgTemplateList();
+      //   }
+      // });
     }
   },
   created() {
