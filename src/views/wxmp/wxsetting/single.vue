@@ -34,7 +34,7 @@
           <div v-if="scope.row.repType === 'text' || scope.row.repType === 'schedule'" v-html="scope.row.repContent"></div>
           <img
             style="max-width: 201px;max-height: 201px;"
-            v-if="scope.row.repType === 'poster'"
+            v-if="scope.row.repType === 'poster' || scope.row.repType === 'pic'"
             :src="scope.row.repContent"
             alt
           />
@@ -44,8 +44,8 @@
       <el-table-column label="操作" width="160">
         <template slot-scope="scope">
           <a
-          style="color: #409EFF;cursor: pointer;margin-right: 12px;"
-            v-if="scope.row.repType === 'poster'"
+            style="color: #409EFF;cursor: pointer;margin-right: 12px;"
+            v-if="scope.row.repType === 'poster' || scope.row.repType === 'pic'"
             @click="handlePreviewPosterModal(scope.row)"
             size="mini"
             type="primary"
@@ -66,49 +66,119 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog title="编辑海报" :visible.sync="editPosterModalShow">
+    <el-dialog
+      :title="selectedTmp && selectedTmp.repType === 'poster' ? '编辑海报' : '编辑图片'"
+      :visible.sync="editPosterModalShow"
+    >
       <div style="text-align:center;" v-if="selectedTmp" class="msg-main">
         <el-form>
-        <p style="text-align:left;font-weight:600">海报底图上传</p>
-        <el-upload
-          :action="actionUrl"
-          :headers="headers"
-          multiple
-          :limit="1"
-          :before-upload="beforeImageUpload"
-          :on-success="handleUploadSuccess"
-          :file-list="fileList"
-          :data="uploadData"
-        >
-          <el-button type="primary">上传图片</el-button>
-          <div slot="tip" class="el-upload__tip">支持bmp/png/jpeg/jpg/gif格式，大小不超过2M，建议图片尺寸宽750px*高1206px</div>
-        </el-upload>
-        <el-row style="margin-top: 10px;" type="flex" justify="start" align="middle">
-          <span style="width: 150px;text-align:left;">二维码定位坐标(x, y)：</span>
-          <el-form-item style="margin-bottom: 0;position: relative;" :class="{'is-error': !rules.qrcodeCoordinate.status}">
-            <el-input class="placeholder-style" @blur="checkoutQrcodeCoordinate" v-model="selectedTmp.qrcodeCoordinate" placeholder="请在英文状态下输入坐标值，单位px" style="width: 227px;"></el-input>&nbsp;
-            <small style="position: absolute;left:0;top: 30px;color:#F56C6C;" v-if="!rules.qrcodeCoordinate.status">{{rules.qrcodeCoordinate.msg}}</small>
-          </el-form-item>
-          <span style="width: 100px;text-align:left;margin-left: 20px;">二维码大小：</span>
-          <el-form-item style="margin-bottom: 0;" :class="{'is-error': !rules.qrcodeSize.status}">
-            <el-input class="placeholder-style" @blur="checkoutQrcodeSize" placeholder="请输入整数" v-model="selectedTmp.qrcodeSize" style="width: 100px;"></el-input>&nbsp;px
-            <small style="position: absolute;left:0;top: 30px;color:#F56C6C;" v-if="!rules.qrcodeSize.status">{{rules.qrcodeSize.msg}}</small>
-          </el-form-item>
-        </el-row>
-        <el-row style="margin-top: 40px;" type="flex" justify="start" align="middle">
-          <span style="width: 150px;text-align:left;">头像定位坐标(x, y)：</span>
-          <el-form-item style="margin-bottom: 0;position: relative;" :class="{'is-error': !rules.avatarCoordinate.status}">
-            <el-input class="placeholder-style" placeholder="请在英文状态下输入坐标值，单位px" @blur="checkoutAvatarCoordinate" v-model="selectedTmp.avatarCoordinate" style="width: 227px;"></el-input>&nbsp;
-            <small style="position: absolute;left:0;top: 30px;color:#F56C6C;" v-if="!rules.avatarCoordinate.status">{{rules.avatarCoordinate.msg}}</small>
-          </el-form-item>
-          <span style="width: 100px;text-align:left;margin-left: 20px;">头像大小：</span>
-          <el-form-item style="margin-bottom: 0;position: relative;" :class="{'is-error': !rules.avatarSize.status}">
-            <el-input class="placeholder-style" placeholder="请输入整数" @blur="checkoutAvatarSize" v-model="selectedTmp.avatarSize" style="width: 100px"></el-input>&nbsp;px
-            <small style="position: absolute;left:0;top: 30px;color:#F56C6C;" v-if="!rules.avatarSize.status">{{rules.avatarSize.msg}}</small>
-          </el-form-item>
-        </el-row>
-        <p style="text-align:left;font-weight:600">备注</p>
-        <el-input type="textarea" show-word-limit maxlength="1000" rows="6" v-model="selectedTmp.remark"></el-input>
+          <p style="text-align:left;font-weight:600">海报底图上传</p>
+          <el-upload
+            :action="actionUrl"
+            :headers="headers"
+            multiple
+            :limit="1"
+            :before-upload="beforeImageUpload"
+            :on-success="handleUploadSuccess"
+            :on-error="handleUploadError"
+            :file-list="fileList"
+            :data="uploadData"
+          >
+            <el-button type="primary">上传图片</el-button>
+            <div
+              slot="tip"
+              class="el-upload__tip"
+            >支持bmp/png/jpeg/jpg/gif格式，大小不超过2M，建议图片尺寸宽750px*高1206px</div>
+          </el-upload>
+          <el-row
+            v-if="selectedTmp.repType === 'poster'"
+            style="margin-top: 10px;"
+            type="flex"
+            justify="start"
+            align="middle"
+          >
+            <span style="width: 150px;text-align:left;">二维码定位坐标(x, y)：</span>
+            <el-form-item
+              style="margin-bottom: 0;position: relative;"
+              :class="{'is-error': !rules.qrcodeCoordinate.status}"
+            >
+              <el-input
+                class="placeholder-style"
+                @blur="checkoutQrcodeCoordinate"
+                v-model="selectedTmp.qrcodeCoordinate"
+                placeholder="请在英文状态下输入坐标值，单位px"
+                style="width: 227px;"
+              ></el-input>&nbsp;
+              <small
+                style="position: absolute;left:0;top: 30px;color:#F56C6C;"
+                v-if="!rules.qrcodeCoordinate.status"
+              >{{rules.qrcodeCoordinate.msg}}</small>
+            </el-form-item>
+            <span style="width: 100px;text-align:left;margin-left: 20px;">二维码大小：</span>
+            <el-form-item style="margin-bottom: 0;" :class="{'is-error': !rules.qrcodeSize.status}">
+              <el-input
+                class="placeholder-style"
+                @blur="checkoutQrcodeSize"
+                placeholder="请输入整数"
+                v-model="selectedTmp.qrcodeSize"
+                style="width: 100px;"
+              ></el-input>&nbsp;px
+              <small
+                style="position: absolute;left:0;top: 30px;color:#F56C6C;"
+                v-if="!rules.qrcodeSize.status"
+              >{{rules.qrcodeSize.msg}}</small>
+            </el-form-item>
+          </el-row>
+          <el-row
+            v-if="selectedTmp.repType === 'poster'"
+            style="margin-top: 40px;"
+            type="flex"
+            justify="start"
+            align="middle"
+          >
+            <span style="width: 150px;text-align:left;">头像定位坐标(x, y)：</span>
+            <el-form-item
+              style="margin-bottom: 0;position: relative;"
+              :class="{'is-error': !rules.avatarCoordinate.status}"
+            >
+              <el-input
+                class="placeholder-style"
+                placeholder="请在英文状态下输入坐标值，单位px"
+                @blur="checkoutAvatarCoordinate"
+                v-model="selectedTmp.avatarCoordinate"
+                style="width: 227px;"
+              ></el-input>&nbsp;
+              <small
+                style="position: absolute;left:0;top: 30px;color:#F56C6C;"
+                v-if="!rules.avatarCoordinate.status"
+              >{{rules.avatarCoordinate.msg}}</small>
+            </el-form-item>
+            <span style="width: 100px;text-align:left;margin-left: 20px;">头像大小：</span>
+            <el-form-item
+              style="margin-bottom: 0;position: relative;"
+              :class="{'is-error': !rules.avatarSize.status}"
+            >
+              <el-input
+                class="placeholder-style"
+                placeholder="请输入整数"
+                @blur="checkoutAvatarSize"
+                v-model="selectedTmp.avatarSize"
+                style="width: 100px"
+              ></el-input>&nbsp;px
+              <small
+                style="position: absolute;left:0;top: 30px;color:#F56C6C;"
+                v-if="!rules.avatarSize.status"
+              >{{rules.avatarSize.msg}}</small>
+            </el-form-item>
+          </el-row>
+          <p style="text-align:left;font-weight:600">备注</p>
+          <el-input
+            type="textarea"
+            show-word-limit
+            maxlength="1000"
+            rows="6"
+            v-model="selectedTmp.remark"
+          ></el-input>
         </el-form>
       </div>
       <div slot="footer" class="dialog-footer">
@@ -116,24 +186,47 @@
         <el-button type="primary" @click="confirmEditPosterModal">确 定</el-button>
       </div>
     </el-dialog>
-
-
-    <el-dialog title="预览海报" :visible.sync="previewPosterModalShow">
+    <el-dialog
+      :title="selectedTmp && selectedTmp.repType === 'poster' ? '预览海报' : '预览图片'"
+      :visible.sync="previewPosterModalShow"
+    >
       <div v-loading="loading" style="text-align:center;" v-if="selectedTmp" class="msg-main">
         <img :src="currentPoster" style="max-width:400px;max-height:400px;" />
         <p>{{selectedTmp.remark}}</p>
       </div>
     </el-dialog>
-
-
-    <el-dialog :title="selectedTmp ? selectedTmp.repType === 'schedule' ? '编辑定时任务':'编辑消息':'编辑消息'" :visible.sync="editTextModalShow">
+    <el-dialog
+      :title="selectedTmp ? selectedTmp.repType === 'schedule' ? '编辑定时任务':'编辑消息':'编辑消息'"
+      :visible.sync="editTextModalShow"
+    >
       <div v-if="selectedTmp" class="msg-main">
-        <p style="font-weight: 600;margin-bottom: 10px;">标题： <span style="font-weight: 400;">{{selectedTmp.title}}</span></p>
-        <p v-if="selectedTmp.repType === 'schedule'" style="font-weight: 600;margin-bottom: 10px;">定时规则：  <el-input style="width: 360px;"  v-model="selectedTmp.scheduleCron"></el-input><el-button plain style="margin-left: 12px" type="primary"><a href="https://www.pppet.net/" target="_blank">规则生成器</a></el-button></p>
+        <p style="font-weight: 600;margin-bottom: 10px;">
+          标题：
+          <span style="font-weight: 400;">{{selectedTmp.title}}</span>
+        </p>
+        <p v-if="selectedTmp.repType === 'schedule'" style="font-weight: 600;margin-bottom: 10px;">
+          定时规则：
+          <el-input style="width: 360px;" v-model="selectedTmp.scheduleCron"></el-input>
+          <el-button plain style="margin-left: 12px" type="primary">
+            <a href="https://www.pppet.net/" target="_blank">规则生成器</a>
+          </el-button>
+        </p>
         <p style="font-weight: 600;text-align:left;" class="title">内容</p>
-        <el-input rows="6" maxlength="1000" type="textarea" show-word-limit v-model="selectedTmp.repContent"></el-input>
+        <el-input
+          rows="6"
+          maxlength="1000"
+          type="textarea"
+          show-word-limit
+          v-model="selectedTmp.repContent"
+        ></el-input>
         <p style="font-weight: 600;">备注</p>
-        <el-input rows="6" maxlength="1000" type="textarea" show-word-limit v-model="selectedTmp.remark"></el-input>
+        <el-input
+          rows="6"
+          maxlength="1000"
+          type="textarea"
+          show-word-limit
+          v-model="selectedTmp.remark"
+        ></el-input>
       </div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="editTextModalShow = false">取 消</el-button>
@@ -142,7 +235,7 @@
     </el-dialog>
 
 
-    <el-dialog title="配置运营活动" :visible.sync="dialogShow">
+    <!-- <el-dialog title="配置运营活动" :visible.sync="dialogShow">
       <div class="msg-main">
         <p>选择活动模板</p>
         <el-select v-model="selectCurrenTemplate">
@@ -158,7 +251,7 @@
         <el-button @click="dialogShow = false">取 消</el-button>
         <el-button :disabled="!selectCurrenTemplate" type="primary" @click="handleConfirmModal">确 定</el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 <script>
@@ -240,7 +333,8 @@ export default {
       typeMap: {
         'text': '文本',
         'poster': '海报',
-        'schedule': '定时任务'
+        'schedule': '定时任务',
+        'pic': "图片"
       }
     };
   },
