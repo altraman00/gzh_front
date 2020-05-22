@@ -354,63 +354,63 @@ export default {
       this.currentTemp = temp;
       this.getMsgTemplateList();
     },
-    checkoutQrcodeCoordinate () {
+    checkoutQrcodeCoordinate() {
       if (this.selectedTmp && this.selectedTmp.qrcodeCoordinate) {
-        let reg = /^(\d)+,(\d)+$/g
+        let reg = /^(\d)+,(\d)+$/g;
         if (!reg.test(this.selectedTmp.qrcodeCoordinate)) {
-          this.rules.qrcodeCoordinate.status = false
-          this.rules.qrcodeCoordinate.msg = '请在英文状态下输入坐标值，单位px'
+          this.rules.qrcodeCoordinate.status = false;
+          this.rules.qrcodeCoordinate.msg = "请在英文状态下输入坐标值，单位px";
         } else {
-          this.rules.qrcodeCoordinate.status = true
-          this.rules.qrcodeCoordinate.msg = ''
+          this.rules.qrcodeCoordinate.status = true;
+          this.rules.qrcodeCoordinate.msg = "";
         }
       } else {
-        this.rules.qrcodeCoordinate.status = false
-        this.rules.qrcodeCoordinate.msg = '内容不可以为空'
+        this.rules.qrcodeCoordinate.status = false;
+        this.rules.qrcodeCoordinate.msg = "内容不可以为空";
       }
     },
-    checkoutAvatarCoordinate () {
+    checkoutAvatarCoordinate() {
       if (this.selectedTmp && this.selectedTmp.avatarCoordinate) {
-        let reg = /^(\d)+,(\d)+$/g
+        let reg = /^(\d)+,(\d)+$/g;
         if (!reg.test(this.selectedTmp.avatarCoordinate)) {
-          this.rules.avatarCoordinate.status = false
-          this.rules.avatarCoordinate.msg = '请在英文状态下输入坐标值，单位px'
+          this.rules.avatarCoordinate.status = false;
+          this.rules.avatarCoordinate.msg = "请在英文状态下输入坐标值，单位px";
         } else {
-          this.rules.avatarCoordinate.status = true
-          this.rules.avatarCoordinate.msg = ''
+          this.rules.avatarCoordinate.status = true;
+          this.rules.avatarCoordinate.msg = "";
         }
       } else {
-        this.rules.avatarCoordinate.status = false
-        this.rules.avatarCoordinate.msg = '内容不可以为空'
+        this.rules.avatarCoordinate.status = false;
+        this.rules.avatarCoordinate.msg = "内容不可以为空";
       }
     },
-    checkoutQrcodeSize () {
+    checkoutQrcodeSize() {
       if (!this.selectedTmp || !this.selectedTmp.qrcodeSize) {
-        this.rules.qrcodeSize.status = false
-        this.rules.qrcodeSize.msg = '内容不可以为空'
+        this.rules.qrcodeSize.status = false;
+        this.rules.qrcodeSize.msg = "内容不可以为空";
       } else {
-        let reg = /^(\d)+$/g
+        let reg = /^(\d)+$/g;
         if (!reg.test(this.selectedTmp.qrcodeSize)) {
-          this.rules.qrcodeSize.status = false
-          this.rules.qrcodeSize.msg = '请输入整数'
+          this.rules.qrcodeSize.status = false;
+          this.rules.qrcodeSize.msg = "请输入整数";
         } else {
-          this.rules.qrcodeSize.status = true
-          this.rules.qrcodeSize.msg = ''
+          this.rules.qrcodeSize.status = true;
+          this.rules.qrcodeSize.msg = "";
         }
       }
     },
-    checkoutAvatarSize () {
+    checkoutAvatarSize() {
       if (!this.selectedTmp || !this.selectedTmp.avatarSize) {
-        this.rules.avatarSize.status = false
-        this.rules.avatarSize.msg = '内容不可以为空'
+        this.rules.avatarSize.status = false;
+        this.rules.avatarSize.msg = "内容不可以为空";
       } else {
-        let reg =/^(\d)+$/g
+        let reg = /^(\d)+$/g;
         if (!reg.test(this.selectedTmp.avatarSize)) {
-          this.rules.avatarSize.status = false
-          this.rules.avatarSize.msg = '请输入整数'
+          this.rules.avatarSize.status = false;
+          this.rules.avatarSize.msg = "请输入整数";
         } else {
-          this.rules.avatarSize.status = true
-          this.rules.avatarSize.msg = ''
+          this.rules.avatarSize.status = true;
+          this.rules.avatarSize.msg = "";
         }
       }
     },
@@ -426,14 +426,14 @@ export default {
       });
     },
     cancelEditPosterModalShow() {
-      console.log('flad')
+      console.log("flad");
       this.fileList = [];
       this.uploadData = {
         mediaType: "image",
         title: "",
         introduction: ""
       };
-      this.selectedTmp = null
+      this.selectedTmp = null;
       this.editPosterModalShow = false;
     },
     selectMaterial(item) {
@@ -479,50 +479,92 @@ export default {
       this.tempObj.set(this.objData.repType, tempObjItem);
     },
     confirmEditPosterModal() {
-      this.checkoutQrcodeCoordinate()
-      this.checkoutQrcodeSize()
-      this.checkoutAvatarCoordinate()
-      this.checkoutAvatarSize()
-      if (!this.rules.qrcodeCoordinate.status || !this.rules.qrcodeSize.status || !this.rules.avatarCoordinate.status || !this.rules.avatarSize.status) {
-        return
-      }
-      if (this.selectedTmp.remark.length > 1000) {
-        return
-      }
-      let params = {
-        remark: this.selectedTmp.remark,
-        repContent: this.tempFile || this.selectedTmp.repContent,
-        repMediaId: this.uploadImgUrl || this.selectedTmp.repMediaId,
-        avatarCoordinate: this.selectedTmp.avatarCoordinate,
-        avatarSize: this.selectedTmp.avatarSize,
-        qrcodeCoordinate: this.selectedTmp.qrcodeCoordinate,
-        qrcodeSize: this.selectedTmp.qrcodeSize
-      };
-      editTemplate(this.selectedTmp.id, params).then(res => {
-        if (res.code === 200) {
-          this.$message({
-            message: "操作成功",
-            type: "success"
-          });
-          this.editPosterModalShow = false;
-          this.getWechatInfo();
+      if (this.selectedTmp.repType === "poster") {
+        this.checkoutQrcodeCoordinate();
+        this.checkoutQrcodeSize();
+        this.checkoutAvatarCoordinate();
+        this.checkoutAvatarSize();
+        if (
+          !this.rules.qrcodeCoordinate.status ||
+          !this.rules.qrcodeSize.status ||
+          !this.rules.avatarCoordinate.status ||
+          !this.rules.avatarSize.status
+        ) {
+          return;
         }
-      });
+      }
+
+      if (this.selectedTmp.remark.length > 1000) {
+        return;
+      }
+      if (this.selectedTmp.repType === "poster") {
+        let params = {
+          remark: this.selectedTmp.remark,
+          repContent: this.tempFile || this.selectedTmp.repContent,
+          repMediaId: this.uploadImgUrl || this.selectedTmp.repMediaId,
+          avatarCoordinate: this.selectedTmp.avatarCoordinate,
+          avatarSize: this.selectedTmp.avatarSize,
+          qrcodeCoordinate: this.selectedTmp.qrcodeCoordinate,
+          qrcodeSize: this.selectedTmp.qrcodeSize
+        };
+        editTemplate(this.selectedTmp.id, params).then(res => {
+          if (res.code === 200) {
+            this.$message({
+              message: "操作成功",
+              type: "success"
+            });
+            this.editPosterModalShow = false;
+            this.getWechatInfo();
+            this.tempFile = null;
+            this.uploadImgUrl = null;
+            this.uploadData = {
+              mediaType: "image",
+              title: "",
+              introduction: ""
+            };
+            this.fileList = [];
+          }
+        });
+      } else {
+        let params = {
+          remark: this.selectedTmp.remark,
+          repContent: this.tempFile || this.selectedTmp.repContent,
+          repMediaId: this.uploadImgUrl || this.selectedTmp.repMediaId
+        };
+        editTemplate(this.selectedTmp.id, params).then(res => {
+          if (res.code === 200) {
+            this.$message({
+              message: "操作成功",
+              type: "success"
+            });
+            this.editPosterModalShow = false;
+            this.getWechatInfo();
+            this.tempFile = null;
+            this.uploadImgUrl = null;
+            this.uploadData = {
+              mediaType: "image",
+              title: "",
+              introduction: ""
+            };
+            this.fileList = [];
+          }
+        });
+      }
     },
     confirmEditTextModal() {
       if (this.selectedTmp.remark.length > 1000) {
-        return
+        return;
       }
       let params = {
         remark: this.selectedTmp.remark,
         repContent: this.selectedTmp.repContent,
         repMediaId: ""
       };
-      if (this.selectedTmp.repType === 'schedule') {
+      if (this.selectedTmp.repType === "schedule") {
         params = {
           ...params,
-          scheduleCron : this.selectedTmp.scheduleCron
-        }
+          scheduleCron: this.selectedTmp.scheduleCron
+        };
       }
       editTemplate(this.selectedTmp.id, params).then(res => {
         if (res.code === 200) {
@@ -534,6 +576,9 @@ export default {
           this.getTemplateList();
         }
       });
+    },
+    handleUploadError(response, file, fileList) {
+      console.log("response", response);
     },
     handleUploadSuccess(response, file, fileList) {
       if (response.code == 200) {
@@ -570,13 +615,18 @@ export default {
     //   this.editPosterModalShow = true
     // },
     handlePreviewPosterModal(tmp) {
-      this.loading = true
-      previewPoster(tmp.id).then(res => {
-        if (res.code === 200) {
-          this.currentPoster = `data:image/png;base64,${res.data.posterBase64}`
-          this.loading = false
-        }
-      })
+      if (tmp.repType === "poster") {
+        this.loading = true;
+
+        previewPoster(tmp.id).then(res => {
+          if (res.code === 200) {
+            this.currentPoster = `data:image/png;base64,${res.data.posterBase64}`;
+            this.loading = false;
+          }
+        });
+      } else {
+        this.currentPoster = tmp.repContent;
+      }
       this.previewPosterModalShow = true;
       this.selectedTmp = tmp;
     },
@@ -585,12 +635,14 @@ export default {
       this.selectedTmp = null;
     },
     handleEditTmp(tmp) {
-      if (tmp.repType === "poster") {
+      if (tmp.repType === "poster" || tmp.repType === "pic") {
         this.selectedTmp = JSON.parse(JSON.stringify(tmp));
-        this.checkoutQrcodeCoordinate()
-        this.checkoutAvatarCoordinate()
-        this.checkoutQrcodeSize()
-        this.checkoutAvatarSize()
+        if (tmp.repType === "poster") {
+          this.checkoutQrcodeCoordinate();
+          this.checkoutAvatarCoordinate();
+          this.checkoutQrcodeSize();
+          this.checkoutAvatarSize();
+        }
         this.editPosterModalShow = true;
       } else {
         this.selectedTmp = tmp;
