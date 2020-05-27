@@ -2,6 +2,10 @@ import { constantRoutes } from '@/router'
 import { getRouters } from '@/api/menu'
 import Layout from '@/layout/index'
 
+const routes = {
+  'Wxsetting' : () => import('@/views/wxmp/wxsetting/index')
+}
+
 const permission = {
   state: {
     routes: [],
@@ -37,7 +41,8 @@ function filterAsyncRouter(asyncRouterMap) {
       if (route.component === 'Layout') {
         route.component = Layout
       } else {
-        route.component = loadView(route.component)
+        // route.component = loadView(route.component)
+        route.component = routes[route.name] || loadView(route.component)
       }
     }
     if (route.children != null && route.children && route.children.length) {
@@ -47,8 +52,18 @@ function filterAsyncRouter(asyncRouterMap) {
   })
 }
 
+// export const loadView = (view) => { // 路由懒加载
+//   return () => import(`@/views/${view}`)
+// }
+const moduleFiles = require.context('../../views', true, /\.vue$/)
+const modules = moduleFiles.keys().reduce((modules, modulePath) => {
+  modules[`${modulePath}`] = moduleFiles(modulePath)
+  return modules
+}, {})
 export const loadView = (view) => { // 路由懒加载
-  return () => import(`@/views/${view}`)
+  // return () => import(/* webpackChunkName: "[request]" */`@/views/${view}`)
+  let module =  modules[`./${view}.vue`]
+  return module.default
 }
 
 export default permission
