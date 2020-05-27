@@ -29,7 +29,7 @@
       <el-table-column type="index" label="序号" align="center" width="80"></el-table-column>
       <el-table-column prop="repTypeDesc" label="类型" width="80"></el-table-column>
       <el-table-column prop="title" label="标题"></el-table-column>
-      <el-table-column prop="scene"  width="200" label="场景值"></el-table-column>
+      <el-table-column prop="scene"  width="120" label="场景值"></el-table-column>
       <el-table-column label="内容">
         <template slot-scope="scope">
           <div v-if="scope.row.repType === 'text' || scope.row.repType === 'schedule'" v-html="scope.row.repContent"></div>
