@@ -32,12 +32,15 @@
       <el-table-column label="内容">
         <template slot-scope="scope">
           <div v-if="scope.row.repType === 'text' || scope.row.repType === 'schedule'" v-html="scope.row.repContent"></div>
-          <img
-            style="max-width: 201px;max-height: 201px;"
-            v-if="scope.row.repType === 'poster' || scope.row.repType === 'pic'"
-            :src="scope.row.repContent"
-            alt
-          />
+          <div v-if="scope.row.repType === 'poster' || scope.row.repType === 'pic'">
+            <img
+              style="max-width: 201px;max-height: 201px;"
+              v-for="pic in scope.row.repContent.split(';')"
+              :key="pic"
+              :src="pic"
+              alt
+            />
+          </div>
         </template>
       </el-table-column>
       <el-table-column prop="remark" label="备注"></el-table-column>
@@ -77,12 +80,12 @@
             :action="actionUrl"
             :headers="headers"
             multiple
-            :limit="1"
             :before-upload="beforeImageUpload"
             :on-success="handleUploadSuccess"
             :on-error="handleUploadError"
             :file-list="fileList"
             :data="uploadData"
+            list-type="picture"
           >
             <el-button type="primary">上传图片</el-button>
             <div
@@ -190,8 +193,12 @@
       :title="selectedTmp && selectedTmp.repType === 'poster' ? '预览海报' : '预览图片'"
       :visible.sync="previewPosterModalShow"
     >
-      <div v-loading="loading" style="text-align:center;" v-if="selectedTmp" class="msg-main">
+      <div v-loading="loading" style="text-align:center;" v-if="selectedTmp && selectedTmp.repType === 'poster'" class="msg-main">
         <img :src="currentPoster" style="max-width:400px;max-height:400px;" />
+        <p>{{selectedTmp.remark}}</p>
+      </div>
+      <div v-if="selectedTmp && selectedTmp.repType === 'pic'" class="msg-main">
+        <img v-for="pic in currentPoster.split(';')" :key="pic" :src="pic" style="max-width:400px;max-height:400px;" />
         <p>{{selectedTmp.remark}}</p>
       </div>
     </el-dialog>
@@ -321,7 +328,7 @@ export default {
           appIdKey: getCurrentGZH().appId
       },
       file: null,
-      tempFile: null,
+      tempFile: [],
       uploadImgUrl: null,
       fileList: [],
       uploadData: {
@@ -500,7 +507,7 @@ export default {
       if (this.selectedTmp.repType === "poster") {
         let params = {
           remark: this.selectedTmp.remark,
-          repContent: this.tempFile || this.selectedTmp.repContent,
+          repContent:  this.tempFile.join(';') || this.selectedTmp.repContent,
           repMediaId: this.uploadImgUrl || this.selectedTmp.repMediaId,
           avatarCoordinate: this.selectedTmp.avatarCoordinate,
           avatarSize: this.selectedTmp.avatarSize,
@@ -515,7 +522,7 @@ export default {
             });
             this.editPosterModalShow = false;
             this.getWechatInfo();
-            this.tempFile = null;
+            this.tempFile = [];
             this.uploadImgUrl = null;
             this.uploadData = {
               mediaType: "image",
@@ -526,9 +533,10 @@ export default {
           }
         });
       } else {
+        console.log('length', this.tempFile)
         let params = {
           remark: this.selectedTmp.remark,
-          repContent: this.tempFile || this.selectedTmp.repContent,
+          repContent: this.tempFile.join(';') || this.selectedTmp.repContent,
           repMediaId: this.uploadImgUrl || this.selectedTmp.repMediaId
         };
         editTemplate(this.selectedTmp.id, params).then(res => {
@@ -539,7 +547,7 @@ export default {
             });
             this.editPosterModalShow = false;
             this.getWechatInfo();
-            this.tempFile = null;
+            this.tempFile = [];
             this.uploadImgUrl = null;
             this.uploadData = {
               mediaType: "image",
@@ -582,7 +590,7 @@ export default {
     },
     handleUploadSuccess(response, file, fileList) {
       if (response.code == 200) {
-        this.tempFile = response.data.url;
+        this.tempFile.push(response.data.url);
         this.uploadImgUrl = response.data.mediaId;
         // this.selectedTmp.repContent = response.url
         // this.selectedTmp.repMediaId = response.mediaId
