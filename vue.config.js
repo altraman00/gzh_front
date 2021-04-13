@@ -6,9 +6,10 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || '尚德微信管理系统' // 标题
+const name = defaultSettings.title || '柠檬微信管理系统' // 标题
 
-const port = process.env.port || process.env.npm_config_port || 8083 // 端口
+// const port = process.env.port || process.env.npm_config_port || 8083 // 端口
+const port = process.env.port || process.env.npm_config_port || 8080 // 端口
 
 // vue.config.js 配置说明
 //官方vue.config.js 参考文档 https://cli.vuejs.org/zh/config/#css-loaderoptions
@@ -33,7 +34,8 @@ module.exports = {
     proxy: {
       // detail: https://cli.vuejs.org/config/#devserver-proxy
       [process.env.VUE_APP_BASE_API]: {
-        target: `http://gzh.supplus.cn/api`,
+        // target: `http://gzh.supplus.cn/api`,
+        target: `http://127.0.0.1:8080/api`,
         changeOrigin: true,
         pathRewrite: {
           ['^' + process.env.VUE_APP_BASE_API]: ''
